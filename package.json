@@ -1,12 +1,9 @@
 {
-  "name": "react-mdnotes",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "react-mdnotes-monorepo",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+    "build": "pnpm -r build",
+    "dev": "pnpm --parallel -r dev",
+    "lint": "pnpm -r lint"
+  }
 }
