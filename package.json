@@ -2,8 +2,9 @@
   "name": "react-mdnotes-monorepo",
   "private": true,
   "scripts": {
-    "build": "pnpm -r build",
-    "dev": "pnpm --parallel -r dev",
-    "lint": "pnpm -r lint"
+    "build": "pnpm --filter react-mdnotes build",
+    "dev": "pnpm run --parallel dev",
+    "dev:core": "pnpm --filter react-mdnotes dev",
+    "dev:demo": "pnpm --filter demo dev"
   }
 }
