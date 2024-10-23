@@ -13,10 +13,7 @@
     "declaration": true,
     "declarationDir": "./dist",
     "outDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-      "*": ["./src/*"]
-    }
+    "baseUrl": "."
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
