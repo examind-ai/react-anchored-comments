@@ -130,6 +130,39 @@ pnpm dev
 - `pnpm dev:core` - Run core in watch mode
 - `pnpm dev:demo` - Run demo application
 
+### Link
+
+To test the library in a local project, you can use `pnpm link`:
+
+```bash
+cd packages/core
+pnpm build  # Build your plugin first
+pnpm link --global
+npm link    # Creates an npm link from the pnpm global link
+```
+
+In the other project:
+
+```bash
+npm link react-mdnotes
+```
+
+### Unlink
+
+To unlink the library:
+
+```bash
+cd packages/core
+pnpm unlink --global
+npm unlink
+```
+
+In the other project:
+
+```bash
+npm unlink react-mdnotes
+```
+
 ## Contributing
 
 Contributions are welcome!
