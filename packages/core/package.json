@@ -13,13 +13,7 @@
     "lint": "eslint src/**/*.ts*"
   },
   "peerDependencies": {
-    "@types/react": ">=16.8.0",
     "react": ">=16.8.0"
-  },
-  "peerDependenciesMeta": {
-    "@types/react": {
-      "optional": true
-    }
   },
   "dependencies": {
     "html-react-parser": "^5.1.18",
@@ -29,6 +23,7 @@
   "devDependencies": {
     "@types/lodash": "^4.17.10",
     "@types/node": "^22.7.8",
+    "@types/react": "^18.3.10",
     "@typescript-eslint/eslint-plugin": "^8.11.0",
     "@typescript-eslint/parser": "^8.11.0",
     "eslint": "^9.11.1",
