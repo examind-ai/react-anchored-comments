@@ -182,7 +182,7 @@ const CommentableSection = ({
   return (
     <div
       ref={sectionRef}
-      style={{ position: 'relative' }}
+      style={{ position: 'relative', height: 'inherit' }}
       onMouseUp={handleInteraction}
     >
       {children}
