@@ -1,5 +1,6 @@
 import { debounce } from 'lodash';
 import { ReactNode, useCallback, useEffect, useRef } from 'react';
+import { NEW_COMMENT_ID } from '../constants';
 import { useCommentPositionContext } from '../contexts/CommentPositionContext';
 import { useSelectionContext } from '../contexts/SelectionContext';
 import { Comment } from '../types';
@@ -113,6 +114,10 @@ const CommentPosition = ({
   };
 
   const adjustedTop = getAdjustedTop(comment.id);
+
+  // This temporary hack prevents scroll jumping when new comment form is rendered,
+  // but at the expense of the positions being calculated without the new comment form.
+  if (adjustedTop === 0 && comment.id === NEW_COMMENT_ID) return null;
 
   return (
     <div
