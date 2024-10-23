@@ -120,9 +120,14 @@ const CommentableSection = ({
       // If there's an actual selection (not just a click)
       if (!range.collapsed) {
         const container =
-          range.commonAncestorContainer.parentElement?.closest(
-            '[data-container-id]',
-          );
+          range.commonAncestorContainer instanceof HTMLElement
+            ? range.commonAncestorContainer?.closest(
+                '[data-container-id]',
+              )
+            : // If everything selected is a textnode, then range.commonAncestorContainer won't be HTMLElement
+              range.commonAncestorContainer.parentElement?.closest(
+                '[data-container-id]',
+              );
         const containerId = container?.getAttribute(
           'data-container-id',
         );
