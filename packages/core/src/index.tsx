@@ -12,4 +12,5 @@ export { createCommentsContext } from './contexts/createCommentsContext';
 export { SelectionProvider } from './contexts/SelectionContext';
 
 // Types
+export type { CommentsContextReturn } from './contexts/createCommentsContext';
 export type { Comment, SelectionRange } from './types';

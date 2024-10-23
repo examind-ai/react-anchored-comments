@@ -47,7 +47,17 @@ type CommentsContextType<T extends Comment> = {
   deleteComment: (commentId: string) => void;
 };
 
-function createCommentsContext<T extends Comment>() {
+export type CommentsContextReturn<T extends Comment> = {
+  useCommentsContext: () => CommentsContextType<T>;
+  CommentsProvider: React.FC<{
+    children: React.ReactNode;
+    initialComments: T[];
+  }>;
+};
+
+function createCommentsContext<
+  T extends Comment,
+>(): CommentsContextReturn<T> {
   const CommentsContext = createContext<
     CommentsContextType<T> | undefined
   >(undefined);
