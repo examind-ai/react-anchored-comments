@@ -2,14 +2,14 @@
   "name": "react-mdnotes",
   "version": "0.1.0",
   "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.tsx --format cjs,esm --dts --external react",
-    "dev": "tsup src/index.tsx --format cjs,esm --dts --watch --external react",
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "tsc --watch --project tsconfig.build.json",
     "lint": "eslint src/**/*.ts*"
   },
   "peerDependencies": {
@@ -29,7 +29,6 @@
     "eslint": "^9.11.1",
     "eslint-plugin-react": "^7.37.1",
     "react": "^18.3.1",
-    "tsup": "^8.3.0",
     "typescript": "^5.5.3"
   }
 }

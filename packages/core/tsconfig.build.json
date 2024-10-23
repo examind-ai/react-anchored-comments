@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": false, // false to ensure both JavaScript and type declaration files are emitted
+    "sourceMap": true,
+    "module": "ESNext",
+    "target": "ES6",
+    "moduleResolution": "Node",
+    "isolatedModules": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "preserveSymlinks": false // Helps with module resolution when using linked packages
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "**/__tests__/**"]
+}
