@@ -97,7 +97,7 @@ import type {
 
 ## Development
 
-This project uses pnpm workspaces with a monorepo structure:
+This project uses npm workspaces with a monorepo structure:
 
 ```
 react-mdnotes/
@@ -111,39 +111,33 @@ react-mdnotes/
 ```bash
 
 # Install dependencies
-
-pnpm install
+npm install
 
 # Build core library
-
-pnpm build
+npm run build
 
 # Run development environment
-
-pnpm dev
+npm run dev
 ```
 
 ### Scripts
 
-- `pnpm build` - Build the core library
-- `pnpm dev` - Run both core (watch mode) and demo
-- `pnpm dev:core` - Run core in watch mode
-- `pnpm dev:demo` - Run demo application
+- `npm run build` - Build the core library
+- `npm run dev` - Run both core (watch mode) and demo
+- `npm run dev:core` - Run core in watch mode
+- `npm run dev:demo` - Run demo application
 
 ### Link
 
 To test the library in a local project, you can use `pnpm link`:
 
 ```bash
+# In the plugin directory (packages/core)
 cd packages/core
-pnpm build  # Build your plugin first
-pnpm link --global
-npm link    # Creates an npm link from the pnpm global link
-```
+npm run build  # Build your plugin first
+npm link
 
-In the other project:
-
-```bash
+# In your other project
 npm link react-mdnotes
 ```
 
@@ -152,15 +146,11 @@ npm link react-mdnotes
 To unlink the library:
 
 ```bash
-cd packages/core
-pnpm unlink --global
-npm unlink
-```
-
-In the other project:
-
-```bash
+# In your other project
 npm unlink react-mdnotes
+
+# In the plugin directory
+npm unlink
 ```
 
 ## Contributing
