@@ -6,5 +6,8 @@
     "dev": "pnpm run --parallel dev",
     "dev:core": "pnpm --filter react-mdnotes dev",
     "dev:demo": "pnpm --filter demo dev"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
   }
 }
