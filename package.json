@@ -5,7 +5,8 @@
     "build": "pnpm --filter react-mdnotes build",
     "dev": "pnpm run --parallel dev",
     "dev:core": "pnpm --filter react-mdnotes dev",
-    "dev:demo": "pnpm --filter demo dev"
+    "dev:demo": "pnpm --filter demo dev",
+    "format": "prettier --write \"**/*.{ts,tsx,css,json,md}\""
   },
   "devDependencies": {
     "prettier": "^3.3.3"
