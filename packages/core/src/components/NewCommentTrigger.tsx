@@ -32,6 +32,9 @@ const NewCommentTriggerMount = ({
     <button
       onClick={handleClick}
       style={{
+        cursor: 'pointer',
+        border: 'none',
+        background: 'none',
         position: 'absolute',
         top: `${
           (positionedSelection.positionTop ?? 0) -
