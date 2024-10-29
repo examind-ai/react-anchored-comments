@@ -15,6 +15,7 @@ const BaseCommentForm = ({
   submitLabel = 'Comment',
 }: BaseCommentFormProps) => {
   const commentFormRef = useRef<HTMLFormElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!commentFormRef.current) return;
@@ -22,7 +23,16 @@ const BaseCommentForm = ({
     const textarea = commentFormRef.current.elements.namedItem(
       'comment',
     ) as HTMLTextAreaElement;
-    textarea.focus();
+
+    // Focusing immedately is a problem because plugin initially sets top to -9999px while it's measuring
+    // height. Focusing during this period will cause the vertical scroll to jump to the top.
+    timerRef.current = setTimeout(() => {
+      textarea.focus();
+    }, 100);
+
+    () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, []);
 
   const submitComment = () => {
