@@ -1,31 +1,22 @@
-import { ReactNode, useEffect } from 'react';
-import { useSelectionContext } from '../contexts/SelectionContext';
+import { ReactNode } from 'react';
+import { useCommentStateContext } from '../contexts/CommentStateContext';
 import { PositionedSelectionRange } from '../types';
 
 const NewCommentTriggerMount = ({
-  positionedSelection,
+  selection,
   right,
   children,
 }: {
-  positionedSelection: PositionedSelectionRange;
+  selection: PositionedSelectionRange;
   right: string;
   children: ReactNode;
 }) => {
-  const {
-    commentableSectionOffsetY,
-    setShowNewCommentBox,
-    setNewCommentSelection,
-    setPositionedSelection,
-  } = useSelectionContext();
+  const { state, dispatch } = useCommentStateContext();
 
-  // Reset showNewCommentBox state so new comment box doesn't show automatically on text select
-  useEffect(() => setShowNewCommentBox(false), []);
+  const { commentableSectionOffsetY } = state;
 
   const handleClick = () => {
-    setNewCommentSelection(positionedSelection);
-
-    setShowNewCommentBox(true);
-    setPositionedSelection(undefined);
+    dispatch({ type: 'SHOW_NEW_COMMENT_BOX' });
   };
 
   return (
@@ -37,8 +28,7 @@ const NewCommentTriggerMount = ({
         background: 'none',
         position: 'absolute',
         top: `${
-          (positionedSelection.positionTop ?? 0) -
-          commentableSectionOffsetY
+          (selection.positionTop ?? 0) - commentableSectionOffsetY
         }px`,
         right,
       }}
@@ -55,15 +45,13 @@ const NewCommentTrigger = ({
   children: ReactNode;
   right: string;
 }) => {
-  const { positionedSelection } = useSelectionContext();
+  const { state } = useCommentStateContext();
+  const { selection } = state;
 
-  if (!positionedSelection) return null;
+  if (!selection) return null;
 
   return (
-    <NewCommentTriggerMount
-      positionedSelection={positionedSelection}
-      right={right}
-    >
+    <NewCommentTriggerMount selection={selection} right={right}>
       {children}
     </NewCommentTriggerMount>
   );

@@ -1,71 +1,54 @@
-import { debounce } from 'lodash';
-import { ReactNode, useCallback, useEffect, useRef } from 'react';
-import { NEW_COMMENT_ID } from '../constants';
-import { useCommentPositionContext } from '../contexts/CommentPositionContext';
-import { useSelectionContext } from '../contexts/SelectionContext';
-import { Comment } from '../types';
+import { ReactNode, useEffect, useLayoutEffect, useRef } from 'react';
+import { useCommentStateContext } from '../contexts/CommentStateContext';
 
 type RenderPropFn = ({
   isActive,
-  setActiveCommentId,
+  onDeleteSuccess,
 }: {
   isActive: boolean;
-  setActiveCommentId: (id: string | null) => void;
+  onDeleteSuccess: () => void;
 }) => ReactNode;
 
 type CommentPositionProps = {
-  comment: Comment;
+  commentId: string;
   transition?: boolean;
-} & (
-  | { children: RenderPropFn }
-  | { children: ReactNode; renderProp?: never }
-);
+  children: React.ReactNode | RenderPropFn;
+};
 
 const CommentPosition = ({
+  commentId,
   children,
-  comment,
   transition = true,
 }: CommentPositionProps) => {
-  const {
-    commentsSectionOffsetY,
-    activeCommentId,
-    setActiveCommentId,
-  } = useSelectionContext();
-  const {
-    registerComment,
-    unregisterComment,
-    getAdjustedTop,
-    updateCommentSize,
-  } = useCommentPositionContext();
+  const { state, dispatch, recalculatePositions, commentPositions } =
+    useCommentStateContext();
+
+  const { commentsSectionOffsetY, activeCommentId } = state;
+
   const commentRef = useRef<HTMLDivElement>(null);
 
-  const debouncedUpdateSize = useCallback(
-    debounce((id: string, height: number) => {
-      updateCommentSize(id, { height });
-    }, 50),
-    [updateCommentSize],
-  );
-
-  useEffect(() => {
-    registerComment(comment.id);
-    return () => {
-      unregisterComment(comment.id);
-      debouncedUpdateSize.cancel();
-    };
-  }, [
-    comment.id,
-    registerComment,
-    unregisterComment,
-    debouncedUpdateSize,
-  ]);
-
-  useEffect(() => {
+  const updateHeightAndRecalculate = () => {
     if (!commentRef.current) return;
 
-    const resizeObserver = new ResizeObserver(entries => {
-      for (let entry of entries) {
-        debouncedUpdateSize(comment.id, entry.contentRect.height);
-      }
+    const height = commentRef.current.getBoundingClientRect().height;
+    dispatch({
+      type: 'UPDATE_COMMENT_HEIGHT',
+      payload: { id: commentId, height },
+    });
+    recalculatePositions();
+  };
+
+  // Measure initial height
+  useLayoutEffect(() => {
+    updateHeightAndRecalculate();
+  }, []);
+
+  // Monitor dynamic height changes
+  useLayoutEffect(() => {
+    if (!commentRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateHeightAndRecalculate();
     });
 
     resizeObserver.observe(commentRef.current);
@@ -73,7 +56,7 @@ const CommentPosition = ({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [comment.id, debouncedUpdateSize]);
+  }, []);
 
   useEffect(() => {
     if (!commentRef.current) return;
@@ -88,11 +71,9 @@ const CommentPosition = ({
       // - Links: Need to handle navigation
       // - Inputs/Textareas: Need to handle text entry
       // - Custom buttons: Elements with role="button" (like div styled as button)
+      const interactiveTags = ['BUTTON', 'A', 'INPUT', 'TEXTAREA'];
       if (
-        target.tagName === 'BUTTON' ||
-        target.tagName === 'A' ||
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
+        interactiveTags.includes(target.tagName) ||
         // closest() checks if the clicked element or any of its parents have role="button"
         // This catches custom button implementations that don't use <button> tags
         target.closest('[role="button"]')
@@ -109,15 +90,15 @@ const CommentPosition = ({
     };
   }, []);
 
-  const onFocus = () => {
-    setActiveCommentId(comment.id);
+  const onDeleteSuccess = () => {
+    dispatch({ type: 'DELETE_COMMENT', payload: { id: commentId } });
   };
 
-  const adjustedTop = getAdjustedTop(comment.id);
+  const onFocus = () => {
+    dispatch({ type: 'SET_ACTIVE_COMMENT_ID', payload: commentId });
+  };
 
-  // This temporary hack prevents scroll jumping when new comment form is rendered,
-  // but at the expense of the positions being calculated without the new comment form.
-  if (adjustedTop === 0 && comment.id === NEW_COMMENT_ID) return null;
+  const adjustedTop = commentPositions[commentId]?.top || 0;
 
   return (
     <div
@@ -134,8 +115,8 @@ const CommentPosition = ({
     >
       {typeof children === 'function'
         ? (children as RenderPropFn)({
-            isActive: activeCommentId === comment.id,
-            setActiveCommentId,
+            isActive: activeCommentId === commentId,
+            onDeleteSuccess,
           })
         : children}
     </div>

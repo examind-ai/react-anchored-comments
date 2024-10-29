@@ -1,103 +1,49 @@
-import { ReactNode, useEffect } from 'react';
+import React from 'react';
+import { useCommentStateContext } from '../contexts/CommentStateContext';
+import { SelectionRange } from '../types';
 import CommentPosition from './CommentPosition';
-import { NEW_COMMENT_ID } from '../constants';
-import { useSelectionContext } from '../contexts/SelectionContext';
-import { PositionedSelectionRange, SelectionRange } from '../types';
-
-const NewCommentPosition = ({
-  newCommentSelection,
-  children,
-}: {
-  newCommentSelection: PositionedSelectionRange;
-  children: ({
-    selectionRange,
-    setShowNewCommentBox,
-    setActiveCommentId,
-  }: {
-    selectionRange: SelectionRange;
-    setShowNewCommentBox: (show: boolean) => void;
-    setActiveCommentId: (commentId: string | null) => void;
-  }) => ReactNode;
-}) => {
-  const {
-    setShowNewCommentBox,
-    setCommentPositionState,
-    setActiveCommentId,
-  } = useSelectionContext();
-
-  useEffect(() => {
-    setCommentPositionState(prev => {
-      const positions = { ...prev.positions };
-      positions[NEW_COMMENT_ID] = {
-        top: newCommentSelection.positionTop,
-      };
-      return {
-        positions,
-        activeCommentId: NEW_COMMENT_ID,
-      };
-    });
-
-    return () => {
-      setCommentPositionState(prev => {
-        const positions = { ...prev.positions };
-        delete positions[NEW_COMMENT_ID];
-        return {
-          positions,
-          activeCommentId:
-            prev.activeCommentId === NEW_COMMENT_ID
-              ? null
-              : prev.activeCommentId,
-        };
-      });
-    };
-  }, []);
-
-  // Even though we have PositionedSelectionRange here, we don't want to leak positionTop outside of this plugin
-  const selectionRange = {
-    containerId: newCommentSelection.containerId,
-    startOffset: newCommentSelection.startOffset,
-    endOffset: newCommentSelection.endOffset,
-  };
-
-  return (
-    <CommentPosition
-      comment={{
-        id: NEW_COMMENT_ID,
-        selectionRange,
-      }}
-      transition={false}
-    >
-      {children({
-        selectionRange,
-        setShowNewCommentBox,
-        setActiveCommentId,
-      })}
-    </CommentPosition>
-  );
-};
 
 const NewComment = ({
   children,
 }: {
   children: ({
     selectionRange,
-    setShowNewCommentBox,
-    setActiveCommentId,
+    onAddSuccess,
+    onCancel,
   }: {
     selectionRange: SelectionRange;
-    setShowNewCommentBox: (show: boolean) => void;
-    setActiveCommentId: (commentId: string | null) => void;
-  }) => ReactNode;
+    onAddSuccess: (newCommentId: string) => void;
+    onCancel: () => void;
+  }) => React.ReactNode;
 }) => {
-  const { newCommentSelection, showNewCommentBox } =
-    useSelectionContext();
+  const { state, dispatch } = useCommentStateContext();
 
-  if (!newCommentSelection || !showNewCommentBox) return null;
+  const { newComment } = state;
+
+  if (!newComment) return null;
+
+  const onAddSuccess = (newCommentId: string) => {
+    dispatch({
+      type: 'ADD_COMMENT',
+      payload: {
+        id: newCommentId,
+        selectionRange: newComment.selectionRange,
+      },
+    });
+  };
+
+  const onCancel = () => {
+    dispatch({ type: 'CANCEL_NEW_COMMENT' });
+  };
 
   return (
-    <NewCommentPosition newCommentSelection={newCommentSelection}>
-      {children}
-    </NewCommentPosition>
+    <CommentPosition commentId={newComment.id} transition={false}>
+      {children({
+        selectionRange: newComment.selectionRange,
+        onAddSuccess,
+        onCancel,
+      })}
+    </CommentPosition>
   );
 };
 

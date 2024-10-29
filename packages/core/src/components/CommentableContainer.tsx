@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useRef } from 'react';
-import { useSelectionContext } from '../contexts/SelectionContext';
+import { useCommentStateContext } from '../contexts/CommentStateContext';
 
 const CommentableContainer = ({
   containerId,
@@ -10,14 +10,14 @@ const CommentableContainer = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { commentableContainers } = useSelectionContext();
+  const { commentableContainers } = useCommentStateContext();
 
   useEffect(() => {
     commentableContainers.current[containerId] = containerRef;
     return () => {
       delete commentableContainers.current[containerId];
     };
-  }, []);
+  }, [containerId]);
 
   return (
     <div data-container-id={containerId} ref={containerRef}>
