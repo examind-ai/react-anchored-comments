@@ -37,7 +37,7 @@ const NewComment = ({
   };
 
   return (
-    <CommentPosition commentId={newComment.id} transition={false}>
+    <CommentPosition commentId={newComment.id}>
       {children({
         selectionRange: newComment.selectionRange,
         onAddSuccess,

@@ -11,14 +11,12 @@ type RenderPropFn = ({
 
 type CommentPositionProps = {
   commentId: string;
-  transition?: boolean;
   children: React.ReactNode | RenderPropFn;
 };
 
 const CommentPosition = ({
   commentId,
   children,
-  transition = true,
 }: CommentPositionProps) => {
   const { state, dispatch, recalculatePositions, commentPositions } =
     useCommentStateContext();
@@ -26,6 +24,9 @@ const CommentPosition = ({
   const { commentsSectionOffsetY, activeCommentId } = state;
 
   const commentRef = useRef<HTMLDivElement>(null);
+
+  // State to track whether the initial positioning has occurred
+  const hasPositionedRef = useRef(false);
 
   const updateHeightAndRecalculate = () => {
     if (!commentRef.current) return;
@@ -98,20 +99,31 @@ const CommentPosition = ({
     dispatch({ type: 'SET_ACTIVE_COMMENT_ID', payload: commentId });
   };
 
-  const adjustedTop = commentPositions[commentId]?.top || 0;
+  // Position off-screen when position is unknown
+  const adjustedTop = commentPositions[commentId]?.top ?? -9999;
+
+  useEffect(() => {
+    if (adjustedTop !== -9999 && !hasPositionedRef.current)
+      hasPositionedRef.current = true;
+  }, [adjustedTop]);
+
+  const shouldTransition = hasPositionedRef.current;
+  const isOffScreen = adjustedTop === -9999;
 
   return (
     <div
       ref={commentRef}
-      tabIndex={0} // Make the div focusable
+      tabIndex={isOffScreen ? -1 : 0} // 0 to make div focusable when not off screen
       style={{
         position: 'absolute',
         top: `${adjustedTop - commentsSectionOffsetY}px`,
-        transition: transition ? 'top 0.3s ease-out' : 'none',
+        transition: shouldTransition ? 'top 0.3s ease-out' : 'none',
         left: 0,
         width: '100%',
+        pointerEvents: isOffScreen ? 'none' : 'auto',
       }}
       onFocus={onFocus}
+      aria-hidden={isOffScreen}
     >
       {typeof children === 'function'
         ? (children as RenderPropFn)({
