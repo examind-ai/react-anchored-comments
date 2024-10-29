@@ -8,9 +8,9 @@ export { default as NewComment } from './components/NewComment';
 export { default as NewCommentTrigger } from './components/NewCommentTrigger';
 
 // Contexts & their hooks
-export { createCommentsContext } from './contexts/createCommentsContext';
-export { SelectionProvider } from './contexts/SelectionContext';
+export { CommentStateProvider } from './contexts/CommentStateContext';
+export { createCommentContext } from './contexts/createCommentContext';
 
 // Types
-export type { CommentsContextReturn } from './contexts/createCommentsContext';
+export type { CommentContextReturn } from './contexts/createCommentContext';
 export type { Comment, SelectionRange } from './types';

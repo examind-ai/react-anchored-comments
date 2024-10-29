@@ -13,12 +13,7 @@ export interface Comment {
   selectionRange: SelectionRange;
 }
 
-export type CommentPositions = Record<string, { top: number }>;
-
-export interface CommentPositionState {
-  positions: CommentPositions;
-  activeCommentId: string | null;
-}
+export type Positions = Record<string, { top: number }>;
 
 export type CommentSize = {
   height: number;

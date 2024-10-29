@@ -5,8 +5,7 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import { useSelectionContext } from '../contexts/SelectionContext';
-import { CommentPositions } from '../types';
+import { useCommentStateContext } from '../contexts/CommentStateContext';
 import {
   findNodeAndOffsetFromTotalOffset,
   getOffsetInTextContent,
@@ -26,37 +25,39 @@ const CommentableSection = ({
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const {
+    state,
+    dispatch,
     commentableContainers,
-    comments,
-    setCommentableSectionOffsetY,
-    setCommentPositionState,
-    setActiveCommentId,
-    setPositionedSelection,
-    showNewCommentBox,
-  } = useSelectionContext();
+    recalculatePositions,
+  } = useCommentStateContext();
 
+  const { newComment, comments } = state;
+
+  // Function to set the offset of the commentable section
   const setOffset = useCallback(() => {
     if (!sectionRef.current) return;
 
     const offset =
       sectionRef.current.getBoundingClientRect().top + window.scrollY;
-    setCommentableSectionOffsetY(offset);
-  }, [setCommentableSectionOffsetY]);
+    dispatch({
+      type: 'UPDATE_COMMENTABLE_SECTION_OFFSETY',
+      payload: offset,
+    });
+  }, [dispatch]);
 
-  const reposition = useCallback(() => {
+  const updateTextPositions = useCallback(() => {
     setOffset();
 
     if (!commentableContainers.current) return;
 
-    setCommentPositionState(prev => ({
-      ...prev,
-      positions: comments.reduce((acc, comment) => {
+    const textPositions = comments.reduce(
+      (acc, comment) => {
         const containerRef =
           commentableContainers.current[
             comment.selectionRange.containerId
           ];
 
-        if (!containerRef?.current) return { ...acc };
+        if (!containerRef?.current) return acc;
 
         const startPosition = findNodeAndOffsetFromTotalOffset(
           containerRef.current,
@@ -67,50 +68,68 @@ const CommentableSection = ({
           comment.selectionRange.endOffset,
         );
 
-        if (!startPosition || !endPosition) return { ...acc };
+        if (!startPosition || !endPosition) return acc;
 
         const range = document.createRange();
         range.setStart(startPosition.node, startPosition.offset);
         range.setEnd(endPosition.node, endPosition.offset);
 
-        // Calculate the updated position
         const rect = range.getBoundingClientRect();
         const scrollTop = document.documentElement.scrollTop;
         const positionTop = rect.top + scrollTop;
 
-        return {
-          ...acc,
-          [comment.id]: {
-            top: positionTop,
-          },
-        };
-      }, {} as CommentPositions),
-    }));
-  }, [comments, setCommentPositionState, setOffset]);
+        acc[comment.id] = { top: positionTop };
+        return acc;
+      },
+      {} as Record<string, { top: number }>,
+    );
+
+    dispatch({
+      type: 'UPDATE_TEXT_POSITIONS',
+      payload: textPositions,
+    });
+  }, [comments, commentableContainers, dispatch, setOffset]);
+
+  const debouncedUpdateTextPositions = useCallback(
+    debounce(updateTextPositions, 50),
+    [updateTextPositions],
+  );
 
   useEffect(() => {
     // Initial call to set correct positions.
-    // Hack: markdown gets render asynchronously, so we need to wait 1 second.
+    // Hack: markdown gets rendered asynchronously, so we need to wait briefly.
     timerRef.current = window.setTimeout(() => {
-      reposition();
+      debouncedUpdateTextPositions();
     }, 100);
 
-    const debouncedReposition = debounce(reposition, 250);
-    window.addEventListener('resize', debouncedReposition);
+    window.addEventListener('resize', debouncedUpdateTextPositions);
+
     return () => {
       window.clearTimeout(timerRef.current);
-      window.removeEventListener('resize', debouncedReposition);
-      debouncedReposition.cancel(); // Cancel any pending debounced calls
+      window.removeEventListener(
+        'resize',
+        debouncedUpdateTextPositions,
+      );
+      debouncedUpdateTextPositions.cancel();
     };
-  }, [reposition]);
+  }, [debouncedUpdateTextPositions]);
+
+  useEffect(() => {
+    // Recalculate positions when text positions or activeCommentId change
+    recalculatePositions();
+  }, [
+    state.textPositions,
+    state.activeCommentId,
+    recalculatePositions,
+  ]);
 
   const handleInteraction = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ) => {
     if (!(e.target instanceof HTMLElement)) return;
 
-    // If new comment box is showing, don't mess with anything:
-    if (showNewCommentBox) return;
+    // If new comment box is showing, don't interfere
+    if (newComment) return;
 
     // Check for text selection first
     const selection = window.getSelection();
@@ -135,8 +154,10 @@ const CommentableSection = ({
           container && sectionRef.current?.contains(container);
 
         if (!containerId || !isWithinCommentable) {
-          setPositionedSelection(undefined);
-          setActiveCommentId(null);
+          dispatch({
+            type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
+            payload: { activeCommentId: null, selection: null },
+          });
           return;
         }
 
@@ -155,13 +176,18 @@ const CommentableSection = ({
         const scrollTop = document.documentElement.scrollTop;
         const positionTop = rect.top + scrollTop;
 
-        setPositionedSelection({
-          startOffset,
-          endOffset,
-          containerId,
-          positionTop,
+        dispatch({
+          type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
+          payload: {
+            activeCommentId: null,
+            selection: {
+              startOffset,
+              endOffset,
+              containerId,
+              positionTop,
+            },
+          },
         });
-        setActiveCommentId(null);
         return;
       }
     }
@@ -170,18 +196,22 @@ const CommentableSection = ({
     // 1. There was no selection at all
     // 2. The selection was collapsed (just a click)
 
-    // Now check if clicking on a comment
+    // Check if clicking on a comment
     const commentId = e.target.getAttribute('data-comment-id');
     if (commentId) {
       e.stopPropagation();
-      setActiveCommentId(commentId);
-      setPositionedSelection(undefined);
+      dispatch({
+        type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
+        payload: { activeCommentId: commentId, selection: null },
+      });
       return;
     }
 
-    // If we get here, it was a click on a non-comment area
-    setPositionedSelection(undefined);
-    setActiveCommentId(null);
+    // Clicked on a non-comment area
+    dispatch({
+      type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
+      payload: { activeCommentId: null, selection: null },
+    });
   };
 
   return (

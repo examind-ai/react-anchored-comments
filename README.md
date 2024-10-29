@@ -75,7 +75,7 @@ Optional component for triggering new comment creation UI.
 import {
   useCommentPosition,
   useSelection,
-  createCommentsContext,
+  createCommentContext,
 } from 'react-mdnotes';
 
 // Get current comment positions

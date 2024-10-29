@@ -8,7 +8,7 @@ import {
 import type { Comment } from '../types';
 
 /*
- * We create a factory function `createCommentsContext` to generate a context,
+ * We create a factory function `createCommentContext` to generate a context,
  * provider, and hook that are specific to any type `T` extending `Comment`.
  * This is necessary because React's default `createContext` doesn't support
  * generics in a way that allows for flexible typing with different types `T`.
@@ -26,53 +26,53 @@ import type { Comment } from '../types';
  *
  * // Create a context specific to `DetailedComment`.
  * const {
- *   useCommentsContext: useDetailedCommentsContext,
- *   CommentsProvider: DetailedCommentsProvider,
- * } = createCommentsContext<DetailedComment>();
+ *   useCommentContext: useDetailedCommentContext,
+ *   CommentProvider: DetailedCommentProvider,
+ * } = createCommentContext<DetailedComment>();
  *
  * // Use the provider in your app.
- * <DetailedCommentsProvider initialComments={initialComments}>
+ * <DetailedCommentProvider initialComments={initialComments}>
  *   <YourComponent />
- * </DetailedCommentsProvider>
+ * </DetailedCommentProvider>
  *
  * // Consume the context in your component.
- * const { comments, addComment } = useDetailedCommentsContext();
+ * const { comments, addComment } = useDetailedCommentContext();
  * // Now `comments` is of type `DetailedComment[]`, and `addComment` accepts a `DetailedComment`.
  */
 
-type CommentsContextType<T extends Comment> = {
+type CommentContextType<T extends Comment> = {
   comments: T[];
   setComments: React.Dispatch<React.SetStateAction<T[]>>;
   addComment: (comment: T) => void;
   deleteComment: (commentId: string) => void;
 };
 
-export type CommentsContextReturn<T extends Comment> = {
-  useCommentsContext: () => CommentsContextType<T>;
-  CommentsProvider: React.FC<{
+export type CommentContextReturn<T extends Comment> = {
+  useCommentContext: () => CommentContextType<T>;
+  CommentProvider: React.FC<{
     children: React.ReactNode;
     initialComments: T[];
   }>;
 };
 
-function createCommentsContext<
+function createCommentContext<
   T extends Comment,
->(): CommentsContextReturn<T> {
-  const CommentsContext = createContext<
-    CommentsContextType<T> | undefined
+>(): CommentContextReturn<T> {
+  const CommentContext = createContext<
+    CommentContextType<T> | undefined
   >(undefined);
 
-  const useCommentsContext = () => {
-    const context = useContext(CommentsContext);
+  const useCommentContext = () => {
+    const context = useContext(CommentContext);
     if (context === undefined) {
       throw new Error(
-        'useCommentsContext must be used within a CommentsProvider',
+        'useCommentContext must be used within a CommentProvider',
       );
     }
     return context;
   };
 
-  const CommentsProvider = ({
+  const CommentProvider = ({
     children,
     initialComments,
   }: {
@@ -108,13 +108,13 @@ function createCommentsContext<
     );
 
     return (
-      <CommentsContext.Provider value={value}>
+      <CommentContext.Provider value={value}>
         {children}
-      </CommentsContext.Provider>
+      </CommentContext.Provider>
     );
   };
 
-  return { useCommentsContext, CommentsProvider };
+  return { useCommentContext, CommentProvider };
 }
 
-export { createCommentsContext };
+export { createCommentContext };

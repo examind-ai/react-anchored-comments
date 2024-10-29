@@ -2,7 +2,7 @@ import parse from 'html-react-parser';
 import { marked } from 'marked';
 import React, { useEffect, useState } from 'react';
 import { NEW_COMMENT_ID } from '../constants';
-import { useSelectionContext } from '../contexts/SelectionContext';
+import { useCommentStateContext } from '../contexts/CommentStateContext';
 import { Comment } from '../types';
 
 const Highlight = ({
@@ -22,8 +22,9 @@ const Highlight = ({
     node: null,
   });
 
-  const { activeCommentId, newCommentSelection } =
-    useSelectionContext();
+  const { state } = useCommentStateContext();
+
+  const { newComment, activeCommentId } = state;
 
   useEffect(() => {
     // Collect all ranges to be highlighted
@@ -32,13 +33,10 @@ const Highlight = ({
       selectionRange: comment.selectionRange,
     }));
 
-    if (
-      newCommentSelection &&
-      containerId === newCommentSelection.containerId
-    )
+    if (containerId === newComment?.selectionRange.containerId)
       selectionRanges.push({
         id: NEW_COMMENT_ID,
-        selectionRange: newCommentSelection,
+        selectionRange: newComment.selectionRange,
       });
 
     const processMarkdown = async () => {

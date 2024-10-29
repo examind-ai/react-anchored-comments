@@ -3,21 +3,21 @@ import {
   CommentableSection,
   CommentPosition,
   CommentsSection,
+  CommentStateProvider,
   NewComment,
-  SelectionProvider,
 } from 'react-mdnotes';
 import AddIcon from './components/features/AddIcon';
 import CommentBox from './components/features/CommentBox';
 import { NewCommentForm } from './components/features/CommentForm';
 import MessageBox from './components/features/MessageBox';
-import CommentsContext, {
-  useCommentsContext,
+import CommentContext, {
+  useCommentContext,
 } from './contexts/CommentContext';
 import { messages } from './data';
 
 const AppLayout = () => {
   const { comments, addComment, deleteComment, setComments } =
-    useCommentsContext();
+    useCommentContext();
 
   const editComment = (commentId: string, text: string) => {
     setComments(prevComments => {
@@ -35,7 +35,7 @@ const AppLayout = () => {
   };
 
   return (
-    <SelectionProvider comments={comments}>
+    <CommentStateProvider initialComments={comments}>
       <div className="flex min-h-screen items-start justify-center bg-gray-100 p-4">
         <div className="flex w-full max-w-6xl">
           <div className="relative mr-4 w-2/3 rounded-lg bg-white p-6 shadow-md">
@@ -62,11 +62,7 @@ const AppLayout = () => {
           <div className="w-1/3 rounded-lg bg-white p-6 shadow-md">
             <CommentsSection>
               <NewComment>
-                {({
-                  selectionRange,
-                  setShowNewCommentBox,
-                  setActiveCommentId,
-                }) => (
+                {({ selectionRange, onAddSuccess, onCancel }) => (
                   <NewCommentForm
                     handleAddComment={text => {
                       const id = Math.random()
@@ -79,25 +75,25 @@ const AppLayout = () => {
                         text,
                         selectionRange,
                       });
-
-                      // TODO: This should be encapsulated in addComment. Inject addComment into this render prop from SelectionContext.
-                      setActiveCommentId(id);
+                      onAddSuccess(id);
                     }}
-                    setShowNewCommentBox={setShowNewCommentBox}
+                    handleCancel={onCancel}
                   />
                 )}
               </NewComment>
               {comments.map(comment => (
-                <CommentPosition key={comment.id} comment={comment}>
-                  {({ isActive, setActiveCommentId }) => (
+                <CommentPosition
+                  key={comment.id}
+                  commentId={comment.id}
+                >
+                  {({ isActive, onDeleteSuccess }) => (
                     <CommentBox
                       comment={comment}
                       isActive={isActive}
                       editComment={editComment}
                       deleteComment={(commentId: string) => {
-                        // TODO: This should be encapsulated in addComment. Inject addComment into this render prop from SelectionContext.
-                        setActiveCommentId(null);
                         deleteComment(commentId);
+                        onDeleteSuccess();
                       }}
                     />
                   )}
@@ -107,13 +103,13 @@ const AppLayout = () => {
           </div>
         </div>
       </div>
-    </SelectionProvider>
+    </CommentStateProvider>
   );
 };
 
 const App = () => {
   return (
-    <CommentsContext
+    <CommentContext
       initialComments={[
         {
           id: 'comment-1',
@@ -150,7 +146,7 @@ Proin ac elit metus. Sed sodales convallis aliquet. Nulla pulvinar in est vehicu
       ]}
     >
       <AppLayout />
-    </CommentsContext>
+    </CommentContext>
   );
 };
 

@@ -15,6 +15,7 @@ const BaseCommentForm = ({
   submitLabel = 'Comment',
 }: BaseCommentFormProps) => {
   const commentFormRef = useRef<HTMLFormElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!commentFormRef.current) return;
@@ -22,7 +23,16 @@ const BaseCommentForm = ({
     const textarea = commentFormRef.current.elements.namedItem(
       'comment',
     ) as HTMLTextAreaElement;
-    textarea.focus();
+
+    // Focusing immedately is a problem because plugin initially sets top to -9999px while it's measuring
+    // height. Focusing during this period will cause the vertical scroll to jump to the top.
+    timerRef.current = setTimeout(() => {
+      textarea.focus();
+    }, 100);
+
+    () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, []);
 
   const submitComment = () => {
@@ -86,10 +96,10 @@ const BaseCommentForm = ({
 
 const NewCommentForm = ({
   handleAddComment,
-  setShowNewCommentBox,
+  handleCancel,
 }: {
   handleAddComment: (text: string) => void;
-  setShowNewCommentBox: (show: boolean) => void;
+  handleCancel: () => void;
 }) => {
   return (
     <div className="mb-2 rounded-lg bg-gray-100 p-3">
@@ -99,9 +109,8 @@ const NewCommentForm = ({
       <BaseCommentForm
         onSubmit={(text: string) => {
           handleAddComment(text);
-          setShowNewCommentBox(false);
         }}
-        onCancel={() => setShowNewCommentBox(false)}
+        onCancel={handleCancel}
       />
     </div>
   );
