@@ -86,10 +86,10 @@ const BaseCommentForm = ({
 
 const NewCommentForm = ({
   handleAddComment,
-  setShowNewCommentBox,
+  handleCancel,
 }: {
   handleAddComment: (text: string) => void;
-  setShowNewCommentBox: (show: boolean) => void;
+  handleCancel: () => void;
 }) => {
   return (
     <div className="mb-2 rounded-lg bg-gray-100 p-3">
@@ -99,9 +99,8 @@ const NewCommentForm = ({
       <BaseCommentForm
         onSubmit={(text: string) => {
           handleAddComment(text);
-          setShowNewCommentBox(false);
         }}
-        onCancel={() => setShowNewCommentBox(false)}
+        onCancel={handleCancel}
       />
     </div>
   );

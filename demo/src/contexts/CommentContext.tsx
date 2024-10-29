@@ -1,11 +1,11 @@
 import { ReactNode } from 'react';
-import { createCommentsContext } from 'react-mdnotes';
+import { createCommentContext } from 'react-mdnotes';
 import type { MessageComment } from '../types';
 
-const { useCommentsContext, CommentsProvider } =
-  createCommentsContext<MessageComment>();
+const { useCommentContext, CommentProvider } =
+  createCommentContext<MessageComment>();
 
-export { useCommentsContext };
+export { useCommentContext };
 
 const CommentsContext = ({
   children,
@@ -15,9 +15,9 @@ const CommentsContext = ({
   initialComments: MessageComment[];
 }) => {
   return (
-    <CommentsProvider initialComments={initialComments}>
+    <CommentProvider initialComments={initialComments}>
       {children}
-    </CommentsProvider>
+    </CommentProvider>
   );
 };
 
