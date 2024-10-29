@@ -86,6 +86,13 @@ export const commentReducer = (
           state.activeCommentId === action.payload.id
             ? null
             : state.activeCommentId,
+        commentHeights: Object.keys(state.commentHeights).reduce(
+          (acc, id) =>
+            id !== action.payload.id
+              ? { ...acc, [id]: state.commentHeights[id] }
+              : acc,
+          {} as Record<string, number>,
+        ),
       };
 
     default:
