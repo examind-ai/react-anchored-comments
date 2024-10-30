@@ -97,14 +97,16 @@ const CommentView = ({ commentId, children }: CommentViewProps) => {
 
   // Position off-screen when position is unknown
   const adjustedTop = commentPositions[commentId]?.top ?? -9999;
+  const isOffScreen = adjustedTop === -9999;
 
   useEffect(() => {
-    if (adjustedTop !== -9999 && !hasPositionedRef.current)
-      hasPositionedRef.current = true;
-  }, [adjustedTop]);
+    if (!isOffScreen && !hasPositionedRef.current)
+      setTimeout(() => {
+        hasPositionedRef.current = true;
+      }, 0); // Force a reflow to trigger transition
+  }, [isOffScreen]);
 
   const shouldTransition = hasPositionedRef.current;
-  const isOffScreen = adjustedTop === -9999;
 
   return (
     <div
