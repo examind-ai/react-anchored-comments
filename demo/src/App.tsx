@@ -10,14 +10,15 @@ import AddIcon from './components/features/AddIcon';
 import CommentBox from './components/features/CommentBox';
 import { NewCommentForm } from './components/features/CommentForm';
 import MessageBox from './components/features/MessageBox';
-import CommentContext, {
-  useCommentContext,
-} from './contexts/CommentContext';
+import {
+  CommentsProvider,
+  useCommentsContext,
+} from './contexts/CommentsContext';
 import { messages } from './data';
 
 const AppLayout = () => {
   const { comments, addComment, deleteComment, setComments } =
-    useCommentContext();
+    useCommentsContext();
 
   const editComment = (commentId: string, text: string) => {
     setComments(prevComments => {
@@ -100,7 +101,7 @@ const AppLayout = () => {
 
 const App = () => {
   return (
-    <CommentContext
+    <CommentsProvider
       initialComments={[
         {
           id: 'comment-1',
@@ -137,7 +138,7 @@ Proin ac elit metus. Sed sodales convallis aliquet. Nulla pulvinar in est vehicu
       ]}
     >
       <AppLayout />
-    </CommentContext>
+    </CommentsProvider>
   );
 };
 
