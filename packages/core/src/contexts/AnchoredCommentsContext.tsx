@@ -1,8 +1,8 @@
 import React, {
   createContext,
   ReactNode,
-  useCallback,
   useContext,
+  useEffect,
   useReducer,
   useRef,
   useState,
@@ -64,7 +64,6 @@ type AnchoredCommentsContextType = {
   // Adjusted positions for CommentViews in CommentSection.
   // Since commentPositions depends on DOM measurements, we'll manage them separate from the main state
   commentPositions: Positions;
-  recalculatePositions: () => void;
 };
 
 const AnchoredCommentsContext =
@@ -96,7 +95,7 @@ export const AnchoredCommentsProvider = ({
     {},
   );
 
-  const recalculatePositions = useCallback(() => {
+  useEffect(() => {
     const textPositionsWithNewComment = {
       ...state.textPositions,
       ...(state.newComment && {
@@ -119,7 +118,13 @@ export const AnchoredCommentsProvider = ({
     );
 
     setCommentPositions(positions);
-  }, [state]);
+  }, [
+    state.textPositions,
+    state.newComment,
+    state.comments,
+    state.activeCommentId,
+    state.commentHeights,
+  ]);
 
   return (
     <AnchoredCommentsContext.Provider
@@ -128,7 +133,6 @@ export const AnchoredCommentsProvider = ({
         dispatch,
         contentViews,
         commentPositions,
-        recalculatePositions,
       }}
     >
       {children}

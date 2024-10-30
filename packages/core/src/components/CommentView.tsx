@@ -15,7 +15,7 @@ type CommentViewProps = {
 };
 
 const CommentView = ({ commentId, children }: CommentViewProps) => {
-  const { state, dispatch, recalculatePositions, commentPositions } =
+  const { state, dispatch, commentPositions } =
     useAnchoredCommentsContext();
 
   const { commentSectionOffsetY, activeCommentId } = state;
@@ -33,7 +33,6 @@ const CommentView = ({ commentId, children }: CommentViewProps) => {
       type: 'UPDATE_COMMENT_HEIGHT',
       payload: { id: commentId, height },
     });
-    recalculatePositions();
   };
 
   // Measure initial height

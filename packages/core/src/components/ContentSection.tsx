@@ -24,7 +24,7 @@ const ContentSection = ({
   const timerRef = useRef<number>();
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { state, dispatch, contentViews, recalculatePositions } =
+  const { state, dispatch, contentViews } =
     useAnchoredCommentsContext();
 
   const { newComment, comments } = state;
@@ -107,15 +107,6 @@ const ContentSection = ({
       debouncedUpdateTextPositions.cancel();
     };
   }, [debouncedUpdateTextPositions]);
-
-  useEffect(() => {
-    // Recalculate positions when text positions or activeCommentId change
-    recalculatePositions();
-  }, [
-    state.textPositions,
-    state.activeCommentId,
-    recalculatePositions,
-  ]);
 
   const handleInteraction = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
