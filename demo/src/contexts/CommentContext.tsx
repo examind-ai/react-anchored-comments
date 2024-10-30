@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { createCommentContext } from 'react-mdnotes';
+import { createCommentContext } from 'react-anchored-comments';
 import type { MessageComment } from '../types';
 
 const { useCommentContext, CommentProvider } =

@@ -5,7 +5,7 @@ import {
   CommentsSection,
   CommentStateProvider,
   NewComment,
-} from 'react-mdnotes';
+} from 'react-anchored-comments';
 import AddIcon from './components/features/AddIcon';
 import CommentBox from './components/features/CommentBox';
 import { NewCommentForm } from './components/features/CommentForm';

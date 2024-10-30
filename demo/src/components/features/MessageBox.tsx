@@ -1,5 +1,5 @@
-import type { Comment } from 'react-mdnotes';
-import { Highlight } from 'react-mdnotes';
+import type { Comment } from 'react-anchored-comments';
+import { Highlight } from 'react-anchored-comments';
 import type { Message } from '../../types';
 
 const MessageBox = ({
