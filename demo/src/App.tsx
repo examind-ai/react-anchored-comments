@@ -5,7 +5,7 @@ import {
   CommentsSection,
   CommentStateProvider,
   NewComment,
-} from 'react-anchored-comments';
+} from '@examind/react-anchored-comments';
 import AddIcon from './components/features/AddIcon';
 import CommentBox from './components/features/CommentBox';
 import { NewCommentForm } from './components/features/CommentForm';

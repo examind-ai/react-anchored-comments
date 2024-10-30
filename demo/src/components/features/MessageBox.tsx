@@ -1,5 +1,5 @@
-import type { Comment } from 'react-anchored-comments';
-import { Highlight } from 'react-anchored-comments';
+import type { Comment } from '@examind/react-anchored-comments';
+import { Highlight } from '@examind/react-anchored-comments';
 import type { Message } from '../../types';
 
 const MessageBox = ({
