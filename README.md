@@ -1,4 +1,4 @@
-# react-anchored-comments
+# @examind/react-anchored-comments
 
 A headless React component library for Google Docs-style commenting and markdown highlighting. Provides precise positioning logic and markdown highlighting capabilities while leaving the UI implementation to the consumer.
 
@@ -14,15 +14,15 @@ A headless React component library for Google Docs-style commenting and markdown
 ## Installation
 
 ```bash
-npm install react-anchored-comments
+npm install @examind/react-anchored-comments
 
 # or
 
-yarn add react-anchored-comments
+yarn add @examind/react-anchored-comments
 
 # or
 
-pnpm add react-anchored-comments
+pnpm add @examind/react-anchored-comments
 ```
 
 ## Quick Start
@@ -32,7 +32,7 @@ import {
   CommentableContainer,
   CommentableSection,
   CommentsSection,
-} from 'react-anchored-comments';
+} from '@examind/react-anchored-comments';
 
 function App() {
   return (
@@ -76,7 +76,7 @@ import {
   useCommentPosition,
   useSelection,
   createCommentContext,
-} from 'react-anchored-comments';
+} from '@examind/react-anchored-comments';
 
 // Get current comment positions
 const { positions } = useCommentPosition();
@@ -92,7 +92,7 @@ import type {
   CommentPosition,
   Comment,
   Selection,
-} from 'react-anchored-comments';
+} from '@examind/react-anchored-comments';
 ```
 
 ## Development
@@ -138,7 +138,7 @@ npm run build  # Build your plugin first
 npm link
 
 # In your other project
-npm link react-anchored-comments
+npm link @examind/react-anchored-comments
 ```
 
 ### Unlink
@@ -147,7 +147,7 @@ To unlink the library:
 
 ```bash
 # In your other project
-npm unlink react-anchored-comments
+npm unlink @examind/react-anchored-comments
 
 # In the plugin directory
 npm unlink
