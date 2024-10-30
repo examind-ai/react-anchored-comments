@@ -119,32 +119,9 @@ export const calculatePositions = (
   // Helper function to get comment height
   const getCommentHeight = (id: string) => commentHeights[id] ?? 0;
 
-  // Assign desired positions
-  sortedComments.forEach(([id, position]) => {
-    finalPositions[id] = position.top;
-  });
-
-  // Adjust positions to prevent overlap before factoring in any active comment
-  for (let i = 0; i < sortedComments.length; i++) {
-    const [currentId] = sortedComments[i];
-    const currentTop = finalPositions[currentId];
-
-    if (i > 0) {
-      const [prevId] = sortedComments[i - 1];
-      const prevTop = finalPositions[prevId];
-      const prevHeight = getCommentHeight(prevId);
-
-      const requiredTop = prevTop + prevHeight + COMMENT_OVERLAP_GAP;
-
-      if (currentTop < requiredTop) {
-        // Adjust current comment's position to prevent overlap
-        finalPositions[currentId] = requiredTop;
-      }
-    }
-  }
-
-  // If there's an active comment, adjust positions only where necessary
   if (activeCommentId && textPositions[activeCommentId]) {
+    // **Case 1: No Active Comment**
+
     const activeIndex = sortedComments.findIndex(
       ([id]) => id === activeCommentId,
     );
@@ -153,7 +130,7 @@ export const calculatePositions = (
     // Set the active comment's position
     finalPositions[activeCommentId] = activeTop;
 
-    // Adjust comments above the active comment
+    // **Adjust comments above the active comment**
     for (let i = activeIndex - 1; i >= 0; i--) {
       const [currentId] = sortedComments[i];
       const desiredTop = textPositions[currentId].top;
@@ -163,21 +140,15 @@ export const calculatePositions = (
       const nextTop = finalPositions[nextId];
 
       // Calculate the maximum top position to prevent overlap
-      const requiredTop =
-        nextTop - currentHeight - COMMENT_OVERLAP_GAP;
+      const maxTop = nextTop - currentHeight - COMMENT_OVERLAP_GAP;
 
-      // Adjust current comment's position upwards without exceeding desired position
-      const adjustedTop = Math.min(desiredTop, requiredTop);
+      // Adjust current comment's position upwards as needed, but do not move above desiredTop
+      const adjustedTop = Math.min(desiredTop, maxTop);
 
-      if (adjustedTop < desiredTop) {
-        finalPositions[currentId] = adjustedTop;
-      } else {
-        // No overlap; stop adjusting further comments
-        break;
-      }
+      finalPositions[currentId] = adjustedTop;
     }
 
-    // Adjust comments below the active comment
+    // **Adjust comments below the active comment**
     for (let i = activeIndex + 1; i < sortedComments.length; i++) {
       const [currentId] = sortedComments[i];
       const desiredTop = textPositions[currentId].top;
@@ -187,16 +158,36 @@ export const calculatePositions = (
       const prevHeight = getCommentHeight(prevId);
 
       // Calculate the minimum top position to prevent overlap
-      const requiredTop = prevTop + prevHeight + COMMENT_OVERLAP_GAP;
+      const minTop = prevTop + prevHeight + COMMENT_OVERLAP_GAP;
 
-      // Adjust current comment's position downwards without exceeding desired position
-      const adjustedTop = Math.max(desiredTop, requiredTop);
+      // Adjust current comment's position downwards as needed, but do not move below desiredTop
+      const adjustedTop = Math.max(desiredTop, minTop);
 
-      if (adjustedTop > desiredTop) {
-        finalPositions[currentId] = adjustedTop;
+      finalPositions[currentId] = adjustedTop;
+    }
+  } else {
+    // **Case 2: Active Comment Present**
+
+    // Adjust positions from top to bottom
+    for (let i = 0; i < sortedComments.length; i++) {
+      const [currentId] = sortedComments[i];
+      const desiredTop = textPositions[currentId].top;
+
+      if (i === 0) {
+        // First comment, place at desired position
+        finalPositions[currentId] = desiredTop;
       } else {
-        // No overlap; stop adjusting further comments
-        break;
+        const prevId = sortedComments[i - 1][0];
+        const prevTop = finalPositions[prevId];
+        const prevHeight = getCommentHeight(prevId);
+
+        // Calculate the minimum top position to prevent overlap
+        const minTop = prevTop + prevHeight + COMMENT_OVERLAP_GAP;
+
+        // Adjust current comment's position downwards as needed
+        const adjustedTop = Math.max(desiredTop, minTop);
+
+        finalPositions[currentId] = adjustedTop;
       }
     }
   }
