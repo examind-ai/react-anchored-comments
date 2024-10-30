@@ -1,6 +1,6 @@
-# react-mdnotes
+# react-anchored-comments
 
-A headless React component library for Google Docs-style commenting and text highlighting. Provides precise positioning logic and text highlighting capabilities while leaving the UI implementation to the consumer.
+A headless React component library for Google Docs-style commenting and markdown highlighting. Provides precise positioning logic and markdown highlighting capabilities while leaving the UI implementation to the consumer.
 
 ## Features
 
@@ -14,15 +14,15 @@ A headless React component library for Google Docs-style commenting and text hig
 ## Installation
 
 ```bash
-npm install react-mdnotes
+npm install react-anchored-comments
 
 # or
 
-yarn add react-mdnotes
+yarn add react-anchored-comments
 
 # or
 
-pnpm add react-mdnotes
+pnpm add react-anchored-comments
 ```
 
 ## Quick Start
@@ -32,7 +32,7 @@ import {
   CommentableContainer,
   CommentableSection,
   CommentsSection,
-} from 'react-mdnotes';
+} from 'react-anchored-comments';
 
 function App() {
   return (
@@ -76,7 +76,7 @@ import {
   useCommentPosition,
   useSelection,
   createCommentContext,
-} from 'react-mdnotes';
+} from 'react-anchored-comments';
 
 // Get current comment positions
 const { positions } = useCommentPosition();
@@ -92,7 +92,7 @@ import type {
   CommentPosition,
   Comment,
   Selection,
-} from 'react-mdnotes';
+} from 'react-anchored-comments';
 ```
 
 ## Development
@@ -100,7 +100,7 @@ import type {
 This project uses npm workspaces with a monorepo structure:
 
 ```
-react-mdnotes/
+react-anchored-comments/
 ├── packages/
 │ └── core/ # Main library code
 └── demo/ # Demo application
@@ -138,7 +138,7 @@ npm run build  # Build your plugin first
 npm link
 
 # In your other project
-npm link react-mdnotes
+npm link react-anchored-comments
 ```
 
 ### Unlink
@@ -147,7 +147,7 @@ To unlink the library:
 
 ```bash
 # In your other project
-npm unlink react-mdnotes
+npm unlink react-anchored-comments
 
 # In the plugin directory
 npm unlink
