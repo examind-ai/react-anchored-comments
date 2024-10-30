@@ -1,11 +1,11 @@
 {
-  "name": "react-mdnotes-monorepo",
+  "name": "@examind/react-anchored-comments-monorepo",
   "private": true,
   "scripts": {
-    "build": "npm run build --workspace react-mdnotes",
+    "build": "npm run build --workspace @examind/react-anchored-comments",
     "dev": "concurrently \"npm run dev:core\" \"npm run dev:demo\"",
-    "dev:core": "npm run dev --workspace react-mdnotes",
-    "dev:demo": "npm run dev --workspace demo",
+    "dev:core": "npm run dev --workspace @examind/react-anchored-comments",
+    "dev:demo": "npm run dev --workspace @examind/react-anchored-comments-demo",
     "format": "prettier --write \"**/*.{ts,tsx,css,json,md}\""
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
-# react-mdnotes
+# @examind/react-anchored-comments
 
-A headless React component library for Google Docs-style commenting and text highlighting. Provides precise positioning logic and text highlighting capabilities while leaving the UI implementation to the consumer.
+A headless React component library for Google Docs-style commenting and markdown highlighting. Provides precise positioning logic and markdown highlighting capabilities while leaving the UI implementation to the consumer.
 
 ## Features
 
@@ -14,76 +14,96 @@ A headless React component library for Google Docs-style commenting and text hig
 ## Installation
 
 ```bash
-npm install react-mdnotes
+npm install @examind/react-anchored-comments
 
 # or
 
-yarn add react-mdnotes
+yarn add @examind/react-anchored-comments
 
 # or
 
-pnpm add react-mdnotes
+pnpm add @examind/react-anchored-comments
 ```
 
 ## Quick Start
 
 ```tsx
 import {
-  CommentableContainer,
-  CommentableSection,
-  CommentsSection,
-} from 'react-mdnotes';
+  AnchoredCommentsProvider,
+  CommentSection,
+  CommentView,
+  ContentSection,
+  ContentView,
+  Highlight,
+  NewComment,
+} from '@examind/react-anchored-comments';
 
 function App() {
   return (
-    <CommentableContainer>
-      <CommentableSection>
-        <div>
-          Your markdown content goes here. Users can select text and
-          add comments to any part of it.
-        </div>
-      </CommentableSection>
-      <CommentsSection />
-    </CommentableContainer>
+    <AnchoredCommentsProvider initialComments={comments}>
+      <ContentSection addIcon={<span>+</span>} iconRight="-3.5rem">
+        {messages.map(message => (
+          <ContentView key={message.id} contentId={message.id}>
+            <div>
+              Your markdown content goes here. Users can select text
+              and add comments to any part of it.
+              <Highlight
+                contentId={message.id}
+                markdown={message.content}
+                comments={comments}
+                color="#fef2cd"
+                activeColor="#fcbc03"
+              />
+            </div>
+          </ContentView>
+        ))}
+      </ContentSection>
+      <CommentSection>
+        <NewComment>
+          {({ selectionRange, onAddSuccess, onCancel }) => (
+            <div>New Comment Form</div>
+          )}
+        </NewComment>
+        {comments.map(comment => (
+          <CommentView key={comment.id} commentId={comment.id}>
+            {({ isActive, onDeleteSuccess }) => (
+              <div>Render comment here</div>
+            )}
+          </CommentView>
+        ))}
+      </CommentSection>
+    </AnchoredCommentsProvider>
   );
 }
 ```
 
 ## Core Components
 
-### CommentableContainer
+### AnchoredCommentsProvider
 
 Root component that provides commenting context and manages state.
 
-### CommentableSection
+### ContentSection
 
-Wrapper for content that can be commented on. Handles text selection and highlighting.
+Wrapper for all contents that can be commented on.
 
-### CommentsSection
+### ContentView
 
-Container for rendering comments. You can provide your own comment rendering components.
+Wrapper for each markdown content block. Provides text selection.
 
-### NewCommentTrigger
+### Highlight
 
-Optional component for triggering new comment creation UI.
+Component for rendering markdown content with comments. Highlights text based on comments.
+
+### CommentSection
+
+Wrapper for all comments.
+
+### CommentView
+
+Component for positioning each comment. You must provide your own comment rendering components.
 
 ## API Reference
-
-### Contexts
-
-```tsx
-import {
-  useCommentPosition,
-  useSelection,
-  createCommentContext,
-} from 'react-mdnotes';
-
-// Get current comment positions
-const { positions } = useCommentPosition();
-
-// Access current text selection
-const { selection } = useSelection();
-```
 
 ### Types
 
@@ -92,7 +112,7 @@ import type {
   CommentPosition,
   Comment,
   Selection,
-} from 'react-mdnotes';
+} from '@examind/react-anchored-comments';
 ```
 
 ## Development
@@ -100,7 +120,7 @@ import type {
 This project uses npm workspaces with a monorepo structure:
 
 ```
-react-mdnotes/
+react-anchored-comments/
 ├── packages/
 │ └── core/ # Main library code
 └── demo/ # Demo application
@@ -138,7 +158,7 @@ npm run build  # Build your plugin first
 npm link
 
 # In your other project
-npm link react-mdnotes
+npm link @examind/react-anchored-comments
 ```
 
 ### Unlink
@@ -147,7 +167,7 @@ To unlink the library:
 
 ```bash
 # In your other project
-npm unlink react-mdnotes
+npm unlink @examind/react-anchored-comments
 
 # In the plugin directory
 npm unlink

@@ -1,5 +1,5 @@
 export interface SelectionRange {
-  containerId: string;
+  contentId: string;
   startOffset: number;
   endOffset: number;
 }

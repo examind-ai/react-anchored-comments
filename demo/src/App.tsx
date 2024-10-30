@@ -1,11 +1,11 @@
 import {
-  CommentableContainer,
-  CommentableSection,
-  CommentPosition,
-  CommentsSection,
-  CommentStateProvider,
+  AnchoredCommentsProvider,
+  CommentSection,
+  CommentView,
+  ContentSection,
+  ContentView,
   NewComment,
-} from 'react-mdnotes';
+} from '@examind/react-anchored-comments';
 import AddIcon from './components/features/AddIcon';
 import CommentBox from './components/features/CommentBox';
 import { NewCommentForm } from './components/features/CommentForm';
@@ -35,32 +35,26 @@ const AppLayout = () => {
   };
 
   return (
-    <CommentStateProvider initialComments={comments}>
+    <AnchoredCommentsProvider initialComments={comments}>
       <div className="flex min-h-screen items-start justify-center bg-gray-100 p-4">
         <div className="flex w-full max-w-6xl">
           <div className="relative mr-4 w-2/3 rounded-lg bg-white p-6 shadow-md">
             <h2 className="mb-4 text-2xl font-bold">AI Chat</h2>
-            <CommentableSection
-              addIcon={<AddIcon />}
-              iconRight="-3.5rem"
-            >
+            <ContentSection addIcon={<AddIcon />} iconRight="-3.5rem">
               {messages.map(message => (
-                <CommentableContainer
-                  key={message.id}
-                  containerId={message.id}
-                >
+                <ContentView key={message.id} contentId={message.id}>
                   <MessageBox
                     message={message}
                     comments={comments.filter(
                       c => c.messageId === message.id,
                     )}
                   />
-                </CommentableContainer>
+                </ContentView>
               ))}
-            </CommentableSection>
+            </ContentSection>
           </div>
           <div className="w-1/3 rounded-lg bg-white p-6 shadow-md">
-            <CommentsSection>
+            <CommentSection>
               <NewComment>
                 {({ selectionRange, onAddSuccess, onCancel }) => (
                   <NewCommentForm
@@ -71,7 +65,7 @@ const AppLayout = () => {
 
                       addComment({
                         id,
-                        messageId: selectionRange.containerId,
+                        messageId: selectionRange.contentId,
                         text,
                         selectionRange,
                       });
@@ -82,10 +76,7 @@ const AppLayout = () => {
                 )}
               </NewComment>
               {comments.map(comment => (
-                <CommentPosition
-                  key={comment.id}
-                  commentId={comment.id}
-                >
+                <CommentView key={comment.id} commentId={comment.id}>
                   {({ isActive, onDeleteSuccess }) => (
                     <CommentBox
                       comment={comment}
@@ -97,13 +88,13 @@ const AppLayout = () => {
                       }}
                     />
                   )}
-                </CommentPosition>
+                </CommentView>
               ))}
-            </CommentsSection>
+            </CommentSection>
           </div>
         </div>
       </div>
-    </CommentStateProvider>
+    </AnchoredCommentsProvider>
   );
 };
 
@@ -116,7 +107,7 @@ const App = () => {
           messageId: '3',
           text: 'First comment',
           selectionRange: {
-            containerId: '3',
+            contentId: '3',
             startOffset: 108,
             endOffset: 130,
           },
@@ -126,7 +117,7 @@ const App = () => {
           messageId: '3',
           text: 'Another comment',
           selectionRange: {
-            containerId: '3',
+            contentId: '3',
             startOffset: 325,
             endOffset: 423,
           },
@@ -140,7 +131,7 @@ Proin ac elit metus. Sed sodales convallis aliquet. Nulla pulvinar in est vehicu
           selectionRange: {
             startOffset: 251,
             endOffset: 292,
-            containerId: '3',
+            contentId: '3',
           },
         },
       ]}

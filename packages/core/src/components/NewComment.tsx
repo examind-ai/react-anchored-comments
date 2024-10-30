@@ -1,7 +1,7 @@
 import React from 'react';
-import { useCommentStateContext } from '../contexts/CommentStateContext';
+import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
 import { SelectionRange } from '../types';
-import CommentPosition from './CommentPosition';
+import CommentView from './CommentView';
 
 const NewComment = ({
   children,
@@ -16,7 +16,7 @@ const NewComment = ({
     onCancel: () => void;
   }) => React.ReactNode;
 }) => {
-  const { state, dispatch } = useCommentStateContext();
+  const { state, dispatch } = useAnchoredCommentsContext();
 
   const { newComment } = state;
 
@@ -37,13 +37,13 @@ const NewComment = ({
   };
 
   return (
-    <CommentPosition commentId={newComment.id}>
+    <CommentView commentId={newComment.id}>
       {children({
         selectionRange: newComment.selectionRange,
         onAddSuccess,
         onCancel,
       })}
-    </CommentPosition>
+    </CommentView>
   );
 };
 

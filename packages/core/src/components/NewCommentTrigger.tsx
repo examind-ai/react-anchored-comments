@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useCommentStateContext } from '../contexts/CommentStateContext';
+import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
 import { PositionedSelectionRange } from '../types';
 
 const NewCommentTriggerMount = ({
@@ -11,12 +11,12 @@ const NewCommentTriggerMount = ({
   right: string;
   children: ReactNode;
 }) => {
-  const { state, dispatch } = useCommentStateContext();
+  const { state, dispatch } = useAnchoredCommentsContext();
 
-  const { commentableSectionOffsetY } = state;
+  const { contentSectionOffsetY } = state;
 
   const handleClick = () => {
-    dispatch({ type: 'SHOW_NEW_COMMENT_BOX' });
+    dispatch({ type: 'SHOW_NEW_COMMENT' });
   };
 
   return (
@@ -28,7 +28,7 @@ const NewCommentTriggerMount = ({
         background: 'none',
         position: 'absolute',
         top: `${
-          (selection.positionTop ?? 0) - commentableSectionOffsetY
+          (selection.positionTop ?? 0) - contentSectionOffsetY
         }px`,
         right,
       }}
@@ -45,7 +45,7 @@ const NewCommentTrigger = ({
   children: ReactNode;
   right: string;
 }) => {
-  const { state } = useCommentStateContext();
+  const { state } = useAnchoredCommentsContext();
   const { selection } = state;
 
   if (!selection) return null;

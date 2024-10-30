@@ -1,5 +1,5 @@
-import type { Comment } from 'react-mdnotes';
-import { Highlight } from 'react-mdnotes';
+import type { Comment } from '@examind/react-anchored-comments';
+import { Highlight } from '@examind/react-anchored-comments';
 import type { Message } from '../../types';
 
 const MessageBox = ({
@@ -16,8 +16,8 @@ const MessageBox = ({
       }`}
     >
       <Highlight
+        contentId={message.id}
         markdown={message.content}
-        containerId={message.id}
         comments={comments}
         color="#fef2cd"
         activeColor="#fcbc03"

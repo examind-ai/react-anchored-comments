@@ -1,5 +1,5 @@
+import { createCommentContext } from '@examind/react-anchored-comments';
 import { ReactNode } from 'react';
-import { createCommentContext } from 'react-mdnotes';
 import type { MessageComment } from '../types';
 
 const { useCommentContext, CommentProvider } =

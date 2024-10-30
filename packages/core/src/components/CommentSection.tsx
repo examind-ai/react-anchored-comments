@@ -1,11 +1,11 @@
 import { debounce } from 'lodash';
 import { ReactNode, useCallback, useEffect, useRef } from 'react';
-import { useCommentStateContext } from '../contexts/CommentStateContext';
+import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
 
-const CommentsSection = ({ children }: { children: ReactNode }) => {
+const CommentSection = ({ children }: { children: ReactNode }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { dispatch } = useCommentStateContext();
+  const { dispatch } = useAnchoredCommentsContext();
 
   const setOffset = useCallback(() => {
     if (!sectionRef.current) return;
@@ -13,7 +13,7 @@ const CommentsSection = ({ children }: { children: ReactNode }) => {
     const offset =
       sectionRef.current.getBoundingClientRect().top + window.scrollY;
     dispatch({
-      type: 'UPDATE_COMMENTS_SECTION_OFFSETY',
+      type: 'UPDATE_COMMENT_SECTION_OFFSETY',
       payload: offset,
     });
   }, [dispatch]);
@@ -37,4 +37,4 @@ const CommentsSection = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export default CommentsSection;
+export default CommentSection;

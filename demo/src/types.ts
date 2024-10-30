@@ -1,4 +1,4 @@
-import { Comment } from 'react-mdnotes';
+import { Comment } from '@examind/react-anchored-comments';
 
 export type Message = {
   id: string;
