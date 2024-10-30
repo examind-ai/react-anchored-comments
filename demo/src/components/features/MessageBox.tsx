@@ -16,8 +16,8 @@ const MessageBox = ({
       }`}
     >
       <Highlight
+        contentId={message.id}
         markdown={message.content}
-        containerId={message.id}
         comments={comments}
         color="#fef2cd"
         activeColor="#fcbc03"
