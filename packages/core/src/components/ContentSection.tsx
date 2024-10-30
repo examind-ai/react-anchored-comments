@@ -5,14 +5,14 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import { useCommentStateContext } from '../contexts/CommentStateContext';
+import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
 import {
   findNodeAndOffsetFromTotalOffset,
   getOffsetInTextContent,
 } from '../utils';
 import NewCommentTrigger from './NewCommentTrigger';
 
-const CommentableSection = ({
+const ContentSection = ({
   children,
   addIcon,
   iconRight,
@@ -24,12 +24,8 @@ const CommentableSection = ({
   const timerRef = useRef<number>();
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const {
-    state,
-    dispatch,
-    commentableContainers,
-    recalculatePositions,
-  } = useCommentStateContext();
+  const { state, dispatch, contentViews, recalculatePositions } =
+    useAnchoredCommentsContext();
 
   const { newComment, comments } = state;
 
@@ -40,7 +36,7 @@ const CommentableSection = ({
     const offset =
       sectionRef.current.getBoundingClientRect().top + window.scrollY;
     dispatch({
-      type: 'UPDATE_COMMENTABLE_SECTION_OFFSETY',
+      type: 'UPDATE_CONTENT_SECTION_OFFSETY',
       payload: offset,
     });
   }, [dispatch]);
@@ -48,14 +44,12 @@ const CommentableSection = ({
   const updateTextPositions = useCallback(() => {
     setOffset();
 
-    if (!commentableContainers.current) return;
+    if (!contentViews.current) return;
 
     const textPositions = comments.reduce(
       (acc, comment) => {
         const containerRef =
-          commentableContainers.current[
-            comment.selectionRange.containerId
-          ];
+          contentViews.current[comment.selectionRange.contentId];
 
         if (!containerRef?.current) return acc;
 
@@ -88,7 +82,7 @@ const CommentableSection = ({
       type: 'UPDATE_TEXT_POSITIONS',
       payload: textPositions,
     });
-  }, [comments, commentableContainers, dispatch, setOffset]);
+  }, [comments, contentViews, dispatch, setOffset]);
 
   const debouncedUpdateTextPositions = useCallback(
     debounce(updateTextPositions, 50),
@@ -128,7 +122,7 @@ const CommentableSection = ({
   ) => {
     if (!(e.target instanceof HTMLElement)) return;
 
-    // If new comment box is showing, don't interfere
+    // If new comment is showing, don't interfere
     if (newComment) return;
 
     // Check for text selection first
@@ -141,19 +135,17 @@ const CommentableSection = ({
         const container =
           range.commonAncestorContainer instanceof HTMLElement
             ? range.commonAncestorContainer?.closest(
-                '[data-container-id]',
+                '[data-content-id]',
               )
             : // If everything selected is a textnode, then range.commonAncestorContainer won't be HTMLElement
               range.commonAncestorContainer.parentElement?.closest(
-                '[data-container-id]',
+                '[data-content-id]',
               );
-        const containerId = container?.getAttribute(
-          'data-container-id',
-        );
+        const contentId = container?.getAttribute('data-content-id');
         const isWithinCommentable =
           container && sectionRef.current?.contains(container);
 
-        if (!containerId || !isWithinCommentable) {
+        if (!contentId || !isWithinCommentable) {
           dispatch({
             type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
             payload: { activeCommentId: null, selection: null },
@@ -183,7 +175,7 @@ const CommentableSection = ({
             selection: {
               startOffset,
               endOffset,
-              containerId,
+              contentId,
               positionTop,
             },
           },
@@ -228,4 +220,4 @@ const CommentableSection = ({
   );
 };
 
-export default CommentableSection;
+export default ContentSection;

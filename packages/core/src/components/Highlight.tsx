@@ -2,18 +2,18 @@ import parse from 'html-react-parser';
 import { marked } from 'marked';
 import React, { useEffect, useState } from 'react';
 import { NEW_COMMENT_ID } from '../constants';
-import { useCommentStateContext } from '../contexts/CommentStateContext';
+import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
 import { Comment } from '../types';
 
 const Highlight = ({
+  contentId,
   markdown,
-  containerId,
   comments,
   color,
   activeColor,
 }: {
+  contentId: string;
   markdown: string;
-  containerId: string;
   comments: Comment[];
   color: string;
   activeColor: string;
@@ -22,7 +22,7 @@ const Highlight = ({
     node: null,
   });
 
-  const { state } = useCommentStateContext();
+  const { state } = useAnchoredCommentsContext();
 
   const { newComment, activeCommentId } = state;
 
@@ -33,7 +33,7 @@ const Highlight = ({
       selectionRange: comment.selectionRange,
     }));
 
-    if (containerId === newComment?.selectionRange.containerId)
+    if (contentId === newComment?.selectionRange.contentId)
       selectionRanges.push({
         id: NEW_COMMENT_ID,
         selectionRange: newComment.selectionRange,

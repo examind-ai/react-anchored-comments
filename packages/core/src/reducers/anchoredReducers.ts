@@ -1,13 +1,13 @@
 import { NEW_COMMENT_ID } from '../constants';
 import {
-  CommentAction,
-  CommentState,
-} from '../contexts/CommentStateContext';
+  AnchoredAction,
+  AnchoredState,
+} from '../contexts/AnchoredCommentsContext';
 
-export const commentReducer = (
-  state: CommentState,
-  action: CommentAction,
-): CommentState => {
+export const anchoredReducers = (
+  state: AnchoredState,
+  action: AnchoredAction,
+): AnchoredState => {
   switch (action.type) {
     case 'SET_ACTIVE_COMMENT_ID':
       return {
@@ -25,8 +25,8 @@ export const commentReducer = (
         selection: action.payload.selection,
       };
 
-    case 'SHOW_NEW_COMMENT_BOX':
-      if (!state.selection) return state; // Cannot show new comment box without a selection
+    case 'SHOW_NEW_COMMENT':
+      if (!state.selection) return state; // Cannot show new comment without a selection
       return {
         ...state,
         newComment: {
@@ -62,11 +62,11 @@ export const commentReducer = (
         textPositions: action.payload,
       };
 
-    case 'UPDATE_COMMENTABLE_SECTION_OFFSETY':
-      return { ...state, commentableSectionOffsetY: action.payload };
+    case 'UPDATE_CONTENT_SECTION_OFFSETY':
+      return { ...state, contentSectionOffsetY: action.payload };
 
-    case 'UPDATE_COMMENTS_SECTION_OFFSETY':
-      return { ...state, commentsSectionOffsetY: action.payload };
+    case 'UPDATE_COMMENT_SECTION_OFFSETY':
+      return { ...state, commentSectionOffsetY: action.payload };
 
     case 'ADD_COMMENT':
       return {

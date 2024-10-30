@@ -7,18 +7,18 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { commentReducer } from '../reducers/commentReducer';
+import { anchoredReducers } from '../reducers/anchoredReducers';
 import type { Comment } from '../types';
 import { PositionedSelectionRange, Positions } from '../types';
 import { calculatePositions } from '../utils/calculatePositions';
 
-export type CommentState = {
-  commentableSectionOffsetY: number;
-  commentsSectionOffsetY: number;
+export type AnchoredState = {
+  contentSectionOffsetY: number;
+  commentSectionOffsetY: number;
   activeCommentId: string | null;
-  textPositions: Positions; // Positions of text anchors in CommentableSection
-  commentHeights: Record<string, number>; // Heights of comment boxes
-  selection: PositionedSelectionRange | null; // Represents current selection in CommentableSection
+  textPositions: Positions; // Positions of text anchors in ContentView
+  commentHeights: Record<string, number>; // Heights of CommentViews
+  selection: PositionedSelectionRange | null; // Represents current selection in ContentSection
   newComment: {
     id: string;
     selectionRange: PositionedSelectionRange;
@@ -27,7 +27,7 @@ export type CommentState = {
   comments: Comment[];
 };
 
-export type CommentAction =
+export type AnchoredAction =
   | { type: 'SET_ACTIVE_COMMENT_ID'; payload: string | null }
   | {
       type: 'SET_SELECTION';
@@ -40,7 +40,7 @@ export type CommentAction =
         selection: PositionedSelectionRange | null;
       };
     }
-  | { type: 'SHOW_NEW_COMMENT_BOX' }
+  | { type: 'SHOW_NEW_COMMENT' }
   | { type: 'CANCEL_NEW_COMMENT' }
   | {
       type: 'UPDATE_COMMENT_HEIGHT';
@@ -50,36 +50,36 @@ export type CommentAction =
       type: 'UPDATE_TEXT_POSITIONS';
       payload: Record<string, { top: number }>;
     }
-  | { type: 'UPDATE_COMMENTABLE_SECTION_OFFSETY'; payload: number }
-  | { type: 'UPDATE_COMMENTS_SECTION_OFFSETY'; payload: number }
+  | { type: 'UPDATE_CONTENT_SECTION_OFFSETY'; payload: number }
+  | { type: 'UPDATE_COMMENT_SECTION_OFFSETY'; payload: number }
   | { type: 'ADD_COMMENT'; payload: Comment }
   | { type: 'DELETE_COMMENT'; payload: { id: string } };
 
-type CommentStateContextType = {
-  state: CommentState;
-  dispatch: React.Dispatch<CommentAction>;
-  commentableContainers: React.MutableRefObject<
+type AnchoredCommentsContextType = {
+  state: AnchoredState;
+  dispatch: React.Dispatch<AnchoredAction>;
+  contentViews: React.MutableRefObject<
     Partial<Record<string, React.RefObject<HTMLDivElement>>>
   >;
-  // Adjusted positions for comment boxes in CommentsSection.
+  // Adjusted positions for CommentViews in CommentSection.
   // Since commentPositions depends on DOM measurements, we'll manage them separate from the main state
   commentPositions: Positions;
   recalculatePositions: () => void;
 };
 
-const CommentStateContext =
-  createContext<CommentStateContextType | null>(null);
+const AnchoredCommentsContext =
+  createContext<AnchoredCommentsContextType | null>(null);
 
-export const CommentStateProvider = ({
+export const AnchoredCommentsProvider = ({
   initialComments,
   children,
 }: {
   initialComments: Comment[];
   children: ReactNode;
 }) => {
-  const [state, dispatch] = useReducer(commentReducer, {
-    commentableSectionOffsetY: 0,
-    commentsSectionOffsetY: 0,
+  const [state, dispatch] = useReducer(anchoredReducers, {
+    contentSectionOffsetY: 0,
+    commentSectionOffsetY: 0,
     activeCommentId: null,
     textPositions: {},
     commentHeights: {},
@@ -88,7 +88,7 @@ export const CommentStateProvider = ({
     comments: initialComments,
   });
 
-  const commentableContainers = useRef<
+  const contentViews = useRef<
     Partial<Record<string, React.RefObject<HTMLDivElement>>>
   >({});
 
@@ -122,25 +122,25 @@ export const CommentStateProvider = ({
   }, [state]);
 
   return (
-    <CommentStateContext.Provider
+    <AnchoredCommentsContext.Provider
       value={{
         state,
         dispatch,
-        commentableContainers,
+        contentViews,
         commentPositions,
         recalculatePositions,
       }}
     >
       {children}
-    </CommentStateContext.Provider>
+    </AnchoredCommentsContext.Provider>
   );
 };
 
-export const useCommentStateContext = () => {
-  const context = useContext(CommentStateContext);
+export const useAnchoredCommentsContext = () => {
+  const context = useContext(AnchoredCommentsContext);
   if (!context) {
     throw new Error(
-      'useCommentStateContext must be used within a CommentStateProvider',
+      'useAnchoredCommentsContext must be used within a AnchoredCommentsProvider',
     );
   }
   return context;

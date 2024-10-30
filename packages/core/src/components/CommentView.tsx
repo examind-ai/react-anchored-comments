@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useLayoutEffect, useRef } from 'react';
-import { useCommentStateContext } from '../contexts/CommentStateContext';
+import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
 
 type RenderPropFn = ({
   isActive,
@@ -9,19 +9,16 @@ type RenderPropFn = ({
   onDeleteSuccess: () => void;
 }) => ReactNode;
 
-type CommentPositionProps = {
+type CommentViewProps = {
   commentId: string;
   children: React.ReactNode | RenderPropFn;
 };
 
-const CommentPosition = ({
-  commentId,
-  children,
-}: CommentPositionProps) => {
+const CommentView = ({ commentId, children }: CommentViewProps) => {
   const { state, dispatch, recalculatePositions, commentPositions } =
-    useCommentStateContext();
+    useAnchoredCommentsContext();
 
-  const { commentsSectionOffsetY, activeCommentId } = state;
+  const { commentSectionOffsetY, activeCommentId } = state;
 
   const commentRef = useRef<HTMLDivElement>(null);
 
@@ -116,7 +113,7 @@ const CommentPosition = ({
       tabIndex={isOffScreen ? -1 : 0} // 0 to make div focusable when not off screen
       style={{
         position: 'absolute',
-        top: `${adjustedTop - commentsSectionOffsetY}px`,
+        top: `${adjustedTop - commentSectionOffsetY}px`,
         transition: shouldTransition ? 'top 0.3s ease-out' : 'none',
         left: 0,
         width: '100%',
@@ -135,4 +132,4 @@ const CommentPosition = ({
   );
 };
 
-export default CommentPosition;
+export default CommentView;
