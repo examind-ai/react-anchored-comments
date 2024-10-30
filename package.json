@@ -1,10 +1,10 @@
 {
-  "name": "react-mdnotes-monorepo",
+  "name": "react-anchored-comments-monorepo",
   "private": true,
   "scripts": {
-    "build": "npm run build --workspace react-mdnotes",
+    "build": "npm run build --workspace react-anchored-comments",
     "dev": "concurrently \"npm run dev:core\" \"npm run dev:demo\"",
-    "dev:core": "npm run dev --workspace react-mdnotes",
+    "dev:core": "npm run dev --workspace react-anchored-comments",
     "dev:demo": "npm run dev --workspace demo",
     "format": "prettier --write \"**/*.{ts,tsx,css,json,md}\""
   },
