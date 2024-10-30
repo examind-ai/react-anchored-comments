@@ -121,7 +121,6 @@ const CommentView = ({ commentId, children }: CommentViewProps) => {
         pointerEvents: isOffScreen ? 'none' : 'auto',
       }}
       onFocus={onFocus}
-      aria-hidden={isOffScreen}
     >
       {typeof children === 'function'
         ? (children as RenderPropFn)({
