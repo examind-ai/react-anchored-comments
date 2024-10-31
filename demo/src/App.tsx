@@ -36,7 +36,7 @@ const AppLayout = () => {
   };
 
   return (
-    <AnchoredCommentsProvider initialComments={comments}>
+    <AnchoredCommentsProvider comments={comments}>
       <div className="flex min-h-screen items-start justify-center bg-gray-100 p-4">
         <div className="flex w-full max-w-6xl">
           <div className="relative mr-4 w-2/3 rounded-lg bg-white p-6 shadow-md">

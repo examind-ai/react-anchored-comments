@@ -53,7 +53,8 @@ export type AnchoredAction =
   | { type: 'UPDATE_CONTENT_SECTION_OFFSETY'; payload: number }
   | { type: 'UPDATE_COMMENT_SECTION_OFFSETY'; payload: number }
   | { type: 'ADD_COMMENT'; payload: Comment }
-  | { type: 'DELETE_COMMENT'; payload: { id: string } };
+  | { type: 'DELETE_COMMENT'; payload: { id: string } }
+  | { type: 'SET_COMMENTS'; payload: Comment[] };
 
 type AnchoredCommentsContextType = {
   state: AnchoredState;
@@ -70,10 +71,10 @@ const AnchoredCommentsContext =
   createContext<AnchoredCommentsContextType | null>(null);
 
 export const AnchoredCommentsProvider = ({
-  initialComments,
+  comments,
   children,
 }: {
-  initialComments: Comment[];
+  comments: Comment[];
   children: ReactNode;
 }) => {
   const [state, dispatch] = useReducer(anchoredReducers, {
@@ -84,7 +85,7 @@ export const AnchoredCommentsProvider = ({
     commentHeights: {},
     selection: null,
     newComment: null,
-    comments: initialComments,
+    comments,
   });
 
   const contentViews = useRef<
@@ -94,6 +95,15 @@ export const AnchoredCommentsProvider = ({
   const [commentPositions, setCommentPositions] = useState<Positions>(
     {},
   );
+
+  useEffect(() => {
+    dispatch({ type: 'SET_COMMENTS', payload: comments });
+  }, [
+    comments
+      .map(c => c.id)
+      .sort((a, b) => a.localeCompare(b))
+      .join(','),
+  ]);
 
   useEffect(() => {
     const textPositionsWithNewComment = {

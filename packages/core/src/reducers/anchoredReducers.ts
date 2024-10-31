@@ -95,6 +95,12 @@ export const anchoredReducers = (
         ),
       };
 
+    case 'SET_COMMENTS':
+      return {
+        ...state,
+        comments: action.payload,
+      };
+
     default:
       return state;
   }
