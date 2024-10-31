@@ -31,6 +31,7 @@ const NewCommentTriggerMount = ({
           (selection.positionTop ?? 0) - contentSectionOffsetY
         }px`,
         right,
+        zIndex: 100,
       }}
     >
       {children}
