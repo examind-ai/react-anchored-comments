@@ -13,9 +13,7 @@ const CommentsContext = createContext<
       comments: MessageComment[];
       addComment: (comment: MessageComment) => void;
       deleteComment: (id: string) => void;
-      setComments: React.Dispatch<
-        React.SetStateAction<MessageComment[]>
-      >;
+      editComment: (id: string, content: string) => void;
     }
   | undefined
 >(undefined);
@@ -46,14 +44,32 @@ const CommentsProvider = ({
     [setComments],
   );
 
+  const editComment = useCallback(
+    (commentId: string, content: string) => {
+      setComments(prevComments => {
+        const index = prevComments.findIndex(c => c.id === commentId);
+        if (index === -1) return prevComments;
+
+        const prevComment = prevComments[index];
+
+        return [
+          ...prevComments.slice(0, index),
+          { ...prevComment, content },
+          ...prevComments.slice(index + 1),
+        ];
+      });
+    },
+    [setComments],
+  );
+
   const value = useMemo(
     () => ({
       comments,
-      setComments,
       addComment,
       deleteComment,
+      editComment,
     }),
-    [comments, setComments, addComment, deleteComment],
+    [comments, editComment, addComment, deleteComment],
   );
 
   return (

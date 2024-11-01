@@ -17,23 +17,8 @@ import {
 import { messages } from './data';
 
 const AppLayout = () => {
-  const { comments, addComment, deleteComment, setComments } =
+  const { comments, addComment, deleteComment, editComment } =
     useCommentsContext();
-
-  const editComment = (commentId: string, text: string) => {
-    setComments(prevComments => {
-      const index = prevComments.findIndex(c => c.id === commentId);
-      if (index === -1) return prevComments;
-
-      const prevComment = prevComments[index];
-
-      return [
-        ...prevComments.slice(0, index),
-        { ...prevComment, text },
-        ...prevComments.slice(index + 1),
-      ];
-    });
-  };
 
   return (
     <AnchoredCommentsProvider comments={comments}>
