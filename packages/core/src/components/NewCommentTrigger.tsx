@@ -1,23 +1,34 @@
 import { ReactNode } from 'react';
 import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
-import { PositionedSelectionRange } from '../types';
+import {
+  getAbsoluteTop,
+  getTotalScrollOffset,
+} from '../utils/elementPosition';
 
-const NewCommentTriggerMount = ({
-  selection,
-  right,
+const NewCommentTrigger = ({
+  contentSectionRef,
   children,
+  right,
 }: {
-  selection: PositionedSelectionRange;
-  right: string;
+  contentSectionRef: React.RefObject<HTMLDivElement>;
   children: ReactNode;
+  right: string;
 }) => {
   const { state, dispatch } = useAnchoredCommentsContext();
+  const { selection } = state;
 
-  const { contentSectionOffsetY } = state;
+  if (!selection) return null;
 
   const handleClick = () => {
     dispatch({ type: 'SHOW_NEW_COMMENT' });
   };
+
+  const contentSectionAbsoluteTop = contentSectionRef.current
+    ? getAbsoluteTop(
+        contentSectionRef.current,
+        getTotalScrollOffset(contentSectionRef.current),
+      )
+    : 0;
 
   return (
     <button
@@ -28,7 +39,7 @@ const NewCommentTriggerMount = ({
         background: 'none',
         position: 'absolute',
         top: `${
-          (selection.positionTop ?? 0) - contentSectionOffsetY
+          (selection.positionTop ?? 0) - contentSectionAbsoluteTop
         }px`,
         right,
         zIndex: 100,
@@ -36,25 +47,6 @@ const NewCommentTriggerMount = ({
     >
       {children}
     </button>
-  );
-};
-
-const NewCommentTrigger = ({
-  children,
-  right,
-}: {
-  children: ReactNode;
-  right: string;
-}) => {
-  const { state } = useAnchoredCommentsContext();
-  const { selection } = state;
-
-  if (!selection) return null;
-
-  return (
-    <NewCommentTriggerMount selection={selection} right={right}>
-      {children}
-    </NewCommentTriggerMount>
   );
 };
 

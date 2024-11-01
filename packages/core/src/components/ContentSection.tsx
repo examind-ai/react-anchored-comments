@@ -10,6 +10,10 @@ import {
   findNodeAndOffsetFromTotalOffset,
   getOffsetInTextContent,
 } from '../utils';
+import {
+  getAbsoluteTop,
+  getTotalScrollOffset,
+} from '../utils/elementPosition';
 import NewCommentTrigger from './NewCommentTrigger';
 
 const ContentSection = ({
@@ -34,18 +38,23 @@ const ContentSection = ({
   const setOffset = useCallback(() => {
     if (!sectionRef.current) return;
 
-    const offset =
-      sectionRef.current.getBoundingClientRect().top + window.scrollY;
     dispatch({
       type: 'UPDATE_CONTENT_SECTION_OFFSETY',
-      payload: offset,
+      payload: getAbsoluteTop(
+        sectionRef.current,
+        getTotalScrollOffset(sectionRef.current),
+      ),
     });
   }, [dispatch]);
 
   const updateTextPositions = useCallback(() => {
     setOffset();
 
+    if (!sectionRef.current) return;
     if (!contentViews.current) return;
+
+    // We can use the sectionRef to get the total scroll offset, as each text position will be scrolling together with the section
+    const scrollOffset = getTotalScrollOffset(sectionRef.current);
 
     const textPositions = comments.reduce(
       (acc, comment) => {
@@ -69,11 +78,9 @@ const ContentSection = ({
         range.setStart(startPosition.node, startPosition.offset);
         range.setEnd(endPosition.node, endPosition.offset);
 
-        const rect = range.getBoundingClientRect();
-        const scrollTop = document.documentElement.scrollTop;
-        const positionTop = rect.top + scrollTop;
-
-        acc[comment.id] = { top: positionTop };
+        acc[comment.id] = {
+          top: getAbsoluteTop(range, scrollOffset),
+        };
         return acc;
       },
       {} as Record<string, { top: number }>,
@@ -126,6 +133,8 @@ const ContentSection = ({
   const handleInteraction = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ) => {
+    if (!sectionRef.current) return;
+
     if (!(e.target instanceof HTMLElement)) return;
 
     // If new comment is showing, don't interfere
@@ -170,9 +179,10 @@ const ContentSection = ({
           range.endOffset,
         );
 
-        const rect = range.getBoundingClientRect();
-        const scrollTop = document.documentElement.scrollTop;
-        const positionTop = rect.top + scrollTop;
+        const positionTop = getAbsoluteTop(
+          range,
+          getTotalScrollOffset(sectionRef.current),
+        );
 
         dispatch({
           type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
@@ -219,7 +229,10 @@ const ContentSection = ({
       onMouseUp={handleInteraction}
     >
       {children}
-      <NewCommentTrigger right={iconRight}>
+      <NewCommentTrigger
+        contentSectionRef={sectionRef}
+        right={iconRight}
+      >
         {addIcon}
       </NewCommentTrigger>
     </div>
