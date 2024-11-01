@@ -23,6 +23,7 @@ const ContentSection = ({
 }) => {
   const timerRef = useRef<number>();
   const sectionRef = useRef<HTMLDivElement>(null);
+  const isFirstRun = useRef(true);
 
   const { state, dispatch, contentViews } =
     useAnchoredCommentsContext();
@@ -91,11 +92,25 @@ const ContentSection = ({
 
   useEffect(() => {
     // Initial call to set correct positions.
-    // Hack: markdown gets rendered asynchronously, so we need to wait briefly.
-    timerRef.current = window.setTimeout(() => {
-      debouncedUpdateTextPositions();
-    }, 100);
+    // Markdown gets rendered asynchronously and the content views
+    // and there may be a delay for contentViews to register into contentViews ref,
+    // so delay before updating text positions on first run.
+    if (isFirstRun.current) {
+      timerRef.current = window.setTimeout(() => {
+        isFirstRun.current = false;
+        updateTextPositions();
+      }, 1000);
+    } else {
+      updateTextPositions();
+    }
 
+    return () => {
+      window.clearTimeout(timerRef.current);
+      // debouncedUpdateTextPositions.cancel();
+    };
+  }, [updateTextPositions]);
+
+  useEffect(() => {
     window.addEventListener('resize', debouncedUpdateTextPositions);
 
     return () => {
