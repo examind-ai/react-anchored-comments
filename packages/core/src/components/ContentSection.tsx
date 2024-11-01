@@ -47,17 +47,17 @@ const ContentSection = ({
 
     const textPositions = comments.reduce(
       (acc, comment) => {
-        const containerRef =
+        const view =
           contentViews.current[comment.selectionRange.contentId];
 
-        if (!containerRef?.current) return acc;
+        if (!view?.current) return acc;
 
         const startPosition = findNodeAndOffsetFromTotalOffset(
-          containerRef.current,
+          view.current,
           comment.selectionRange.startOffset,
         );
         const endPosition = findNodeAndOffsetFromTotalOffset(
-          containerRef.current,
+          view.current,
           comment.selectionRange.endOffset,
         );
 
