@@ -21,6 +21,7 @@ const ContentSection = ({
   addIcon: ReactNode;
   iconRight: string;
 }) => {
+  const timerRef = useRef<number>();
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const { state, dispatch, contentViews } =
@@ -89,13 +90,16 @@ const ContentSection = ({
   );
 
   useEffect(() => {
-    // Debounce to delay initial call to set correct positions
-    // because markdown gets rendered asynchronously.
-    debouncedUpdateTextPositions();
+    // Initial call to set correct positions.
+    // Hack: markdown gets rendered asynchronously, so we need to wait briefly.
+    timerRef.current = window.setTimeout(() => {
+      debouncedUpdateTextPositions();
+    }, 100);
 
     window.addEventListener('resize', debouncedUpdateTextPositions);
 
     return () => {
+      window.clearTimeout(timerRef.current);
       window.removeEventListener(
         'resize',
         debouncedUpdateTextPositions,
