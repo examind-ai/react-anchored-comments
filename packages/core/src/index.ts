@@ -11,4 +11,4 @@ export { default as NewCommentTrigger } from './components/NewCommentTrigger';
 export { AnchoredCommentsProvider } from './contexts/AnchoredCommentsContext';
 
 // Types
-export type { Comment, SelectionRange } from './types';
+export type { CommentAnchor, SelectionRange } from './types';

@@ -12,11 +12,11 @@ import { EditCommentForm } from './CommentForm';
 const MAX_HEIGHT = 100;
 const EXPANDED_MAX_HEIGHT = 1000; // This should be larger than any expected comment height
 
-const renderComment = (text: string) => {
-  return text.split('\n').map((line, index) => (
+const renderComment = (content: string) => {
+  return content.split('\n').map((line, index) => (
     <React.Fragment key={index}>
       {line}
-      {index < text.split('\n').length - 1 && <br />}
+      {index < content.split('\n').length - 1 && <br />}
     </React.Fragment>
   ));
 };
@@ -33,7 +33,7 @@ const CommentContent: React.FC<{
     if (contentRef.current) {
       setShowShowMore(contentRef.current.scrollHeight > MAX_HEIGHT);
     }
-  }, [comment.text]);
+  }, [comment.content]);
 
   useEffect(() => {
     if (!isActive) setIsExpanded(false);
@@ -55,7 +55,7 @@ const CommentContent: React.FC<{
           transition: 'max-height 0.3s ease-out',
         }}
       >
-        {renderComment(comment.text)}
+        {renderComment(comment.content)}
       </div>
       {showShowMore && (
         <button
@@ -72,7 +72,7 @@ const CommentContent: React.FC<{
 const CommentBox: React.FC<{
   comment: MessageComment;
   isActive: boolean;
-  editComment: (commentId: string, text: string) => void;
+  editComment: (commentId: string, content: string) => void;
   deleteComment: (commentId: string) => void;
 }> = ({ comment, isActive, editComment, deleteComment }) => {
   const [editing, setEditing] = useState(false);
@@ -122,8 +122,8 @@ const CommentBox: React.FC<{
       {editing ? (
         <EditCommentForm
           comment={comment}
-          onSave={text => {
-            editComment(comment.id, text);
+          onSave={content => {
+            editComment(comment.id, content);
             setEditing(false);
           }}
           onCancel={() => setEditing(false)}

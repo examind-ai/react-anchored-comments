@@ -1,13 +1,13 @@
-import type { Comment } from '@examind/react-anchored-comments';
+import type { CommentAnchor } from '@examind/react-anchored-comments';
 import { Highlight } from '@examind/react-anchored-comments';
 import type { Message } from '../../types';
 
 const MessageBox = ({
   message,
-  comments,
+  anchors,
 }: {
   message: Message;
-  comments: Comment[];
+  anchors: CommentAnchor[];
 }) => {
   return (
     <div
@@ -18,7 +18,7 @@ const MessageBox = ({
       <Highlight
         contentId={message.id}
         markdown={message.content}
-        comments={comments}
+        anchors={anchors}
         color="#fef2cd"
         activeColor="#fcbc03"
       />

@@ -1,3 +1,8 @@
+export interface CommentAnchor {
+  id: string;
+  selectionRange: SelectionRange;
+}
+
 export interface SelectionRange {
   contentId: string;
   startOffset: number;
@@ -6,11 +11,6 @@ export interface SelectionRange {
 
 export interface PositionedSelectionRange extends SelectionRange {
   positionTop: number;
-}
-
-export interface Comment {
-  id: string;
-  selectionRange: SelectionRange;
 }
 
 export type Positions = Record<string, { top: number }>;

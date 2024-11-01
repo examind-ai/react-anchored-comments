@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { anchoredReducers } from '../reducers/anchoredReducers';
-import type { Comment } from '../types';
+import type { CommentAnchor } from '../types';
 import { PositionedSelectionRange, Positions } from '../types';
 import { calculatePositions } from '../utils/calculatePositions';
 
@@ -24,7 +24,7 @@ export type AnchoredState = {
     selectionRange: PositionedSelectionRange;
     height?: number;
   } | null;
-  comments: Comment[];
+  anchors: CommentAnchor[];
 };
 
 export type AnchoredAction =
@@ -52,9 +52,9 @@ export type AnchoredAction =
     }
   | { type: 'UPDATE_CONTENT_SECTION_OFFSETY'; payload: number }
   | { type: 'UPDATE_COMMENT_SECTION_OFFSETY'; payload: number }
-  | { type: 'ADD_COMMENT'; payload: Comment }
-  | { type: 'DELETE_COMMENT'; payload: { id: string } }
-  | { type: 'SET_COMMENTS'; payload: Comment[] };
+  | { type: 'ADD_ANCHOR'; payload: CommentAnchor }
+  | { type: 'DELETE_ANCHOR'; payload: { id: string } }
+  | { type: 'SET_ANCHORS'; payload: CommentAnchor[] };
 
 type AnchoredCommentsContextType = {
   state: AnchoredState;
@@ -71,10 +71,10 @@ const AnchoredCommentsContext =
   createContext<AnchoredCommentsContextType | null>(null);
 
 export const AnchoredCommentsProvider = ({
-  comments,
+  anchors,
   children,
 }: {
-  comments: Comment[];
+  anchors: CommentAnchor[];
   children: ReactNode;
 }) => {
   const [state, dispatch] = useReducer(anchoredReducers, {
@@ -85,7 +85,7 @@ export const AnchoredCommentsProvider = ({
     commentHeights: {},
     selection: null,
     newComment: null,
-    comments,
+    anchors,
   });
 
   const contentViews = useRef<
@@ -97,10 +97,10 @@ export const AnchoredCommentsProvider = ({
   );
 
   useEffect(() => {
-    dispatch({ type: 'SET_COMMENTS', payload: comments });
+    dispatch({ type: 'SET_ANCHORS', payload: anchors });
   }, [
-    comments
-      .map(c => c.id)
+    anchors
+      .map(a => a.id)
       .sort((a, b) => a.localeCompare(b))
       .join(','),
   ]);
@@ -116,7 +116,7 @@ export const AnchoredCommentsProvider = ({
     };
 
     const visibleComments = new Set([
-      ...state.comments.map(comment => comment.id),
+      ...state.anchors.map(comment => comment.id),
       ...(state.newComment ? [state.newComment.id] : []),
     ]);
 
@@ -131,7 +131,7 @@ export const AnchoredCommentsProvider = ({
   }, [
     state.textPositions,
     state.newComment,
-    state.comments,
+    state.anchors,
     state.activeCommentId,
     state.commentHeights,
   ]);

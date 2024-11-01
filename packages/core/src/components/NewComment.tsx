@@ -24,7 +24,7 @@ const NewComment = ({
 
   const onAddSuccess = (newCommentId: string) => {
     dispatch({
-      type: 'ADD_COMMENT',
+      type: 'ADD_ANCHOR',
       payload: {
         id: newCommentId,
         selectionRange: {

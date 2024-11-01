@@ -2,7 +2,7 @@ import { KeyboardEvent, useEffect, useRef } from 'react';
 import type { MessageComment } from '../../types';
 
 interface BaseCommentFormProps {
-  onSubmit: (text: string) => void;
+  onSubmit: (content: string) => void;
   onCancel: () => void;
   initialText?: string;
   submitLabel?: string;
@@ -39,13 +39,13 @@ const BaseCommentForm = ({
     if (!commentFormRef.current) return;
 
     const form = commentFormRef.current;
-    const commentText = (
+    const content = (
       form.elements.namedItem('comment') as HTMLTextAreaElement
     ).value;
 
-    if (!commentText) return;
+    if (!content) return;
 
-    onSubmit(commentText);
+    onSubmit(content);
     form.reset();
   };
 
@@ -98,7 +98,7 @@ const NewCommentForm = ({
   handleAddComment,
   handleCancel,
 }: {
-  handleAddComment: (text: string) => void;
+  handleAddComment: (content: string) => void;
   handleCancel: () => void;
 }) => {
   return (
@@ -107,8 +107,8 @@ const NewCommentForm = ({
         <span className="font-bold">Jane Doe</span>
       </div>
       <BaseCommentForm
-        onSubmit={(text: string) => {
-          handleAddComment(text);
+        onSubmit={(content: string) => {
+          handleAddComment(content);
         }}
         onCancel={handleCancel}
       />
@@ -122,14 +122,14 @@ const EditCommentForm = ({
   onCancel,
 }: {
   comment: MessageComment;
-  onSave: (text: string) => void;
+  onSave: (content: string) => void;
   onCancel: () => void;
 }) => {
   return (
     <BaseCommentForm
       onSubmit={onSave}
       onCancel={onCancel}
-      initialText={comment.text}
+      initialText={comment.content}
       submitLabel="Save"
     />
   );

@@ -32,7 +32,7 @@ const ContentSection = ({
   const { state, dispatch, contentViews } =
     useAnchoredCommentsContext();
 
-  const { newComment, comments } = state;
+  const { newComment, anchors } = state;
 
   // Function to set the offset of the commentable section
   const setOffset = useCallback(() => {
@@ -56,7 +56,7 @@ const ContentSection = ({
     // We can use the sectionRef to get the total scroll offset, as each text position will be scrolling together with the section
     const scrollOffset = getTotalScrollOffset(sectionRef.current);
 
-    const textPositions = comments.reduce(
+    const textPositions = anchors.reduce(
       (acc, comment) => {
         const view =
           contentViews.current[comment.selectionRange.contentId];
@@ -90,7 +90,7 @@ const ContentSection = ({
       type: 'UPDATE_TEXT_POSITIONS',
       payload: textPositions,
     });
-  }, [comments, contentViews, dispatch, setOffset]);
+  }, [anchors, contentViews, dispatch, setOffset]);
 
   const debouncedUpdateTextPositions = useCallback(
     debounce(updateTextPositions, 50),

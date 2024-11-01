@@ -1,4 +1,4 @@
-import { Comment } from '@examind/react-anchored-comments';
+import { SelectionRange } from '@examind/react-anchored-comments';
 
 export type Message = {
   id: string;
@@ -6,7 +6,9 @@ export type Message = {
   role: 'user' | 'assistant';
 };
 
-export interface MessageComment extends Comment {
+export interface MessageComment {
+  id: string;
   messageId: string;
-  text: string;
+  content: string;
+  selectionRange: SelectionRange;
 }

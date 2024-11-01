@@ -3,18 +3,18 @@ import { marked } from 'marked';
 import React, { useEffect, useState } from 'react';
 import { NEW_COMMENT_ID } from '../constants';
 import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
-import { Comment } from '../types';
+import { CommentAnchor } from '../types';
 
 const Highlight = ({
   contentId,
   markdown,
-  comments,
+  anchors,
   color,
   activeColor,
 }: {
   contentId: string;
   markdown: string;
-  comments: Comment[];
+  anchors: CommentAnchor[];
   color: string;
   activeColor: string;
 }) => {
@@ -27,14 +27,11 @@ const Highlight = ({
   const { newComment, activeCommentId } = state;
 
   useEffect(() => {
-    // Collect all ranges to be highlighted
-    const selectionRanges: Array<Comment> = comments.map(comment => ({
-      id: comment.id,
-      selectionRange: comment.selectionRange,
-    }));
+    // Collect all anchors to be highlighted
+    const allAnchors: Array<CommentAnchor> = [...anchors];
 
     if (contentId === newComment?.selectionRange.contentId)
-      selectionRanges.push({
+      allAnchors.push({
         id: NEW_COMMENT_ID,
         selectionRange: newComment.selectionRange,
       });
@@ -45,7 +42,7 @@ const Highlight = ({
       const result = processChildren(
         reactElements,
         0,
-        selectionRanges,
+        allAnchors,
         activeCommentId,
         color,
         activeColor,
@@ -54,7 +51,7 @@ const Highlight = ({
     };
 
     processMarkdown();
-  }, [setResult, markdown, comments, activeCommentId]);
+  }, [setResult, markdown, anchors, activeCommentId]);
 
   return <>{result.node}</>;
 };
@@ -64,7 +61,7 @@ export default Highlight;
 function processNode(
   node: React.ReactNode,
   offset: number,
-  comments: Comment[],
+  anchors: CommentAnchor[],
   activeCommentId: string | null,
   color: string,
   activeColor: string,
@@ -73,7 +70,7 @@ function processNode(
     return processTextNode(
       node,
       offset,
-      comments,
+      anchors,
       activeCommentId,
       color,
       activeColor,
@@ -82,7 +79,7 @@ function processNode(
     return processElementNode(
       node,
       offset,
-      comments,
+      anchors,
       activeCommentId,
       color,
       activeColor,
@@ -91,7 +88,7 @@ function processNode(
     return processArrayNode(
       node,
       offset,
-      comments,
+      anchors,
       activeCommentId,
       color,
       activeColor,
@@ -104,7 +101,7 @@ function processNode(
 function processChildren(
   children: React.ReactNode,
   offset: number,
-  comments: Comment[],
+  anchors: CommentAnchor[],
   activeCommentId: string | null,
   color: string,
   activeColor: string,
@@ -113,7 +110,7 @@ function processChildren(
     return processArrayNode(
       children,
       offset,
-      comments,
+      anchors,
       activeCommentId,
       color,
       activeColor,
@@ -122,7 +119,7 @@ function processChildren(
     return processNode(
       children,
       offset,
-      comments,
+      anchors,
       activeCommentId,
       color,
       activeColor,
@@ -131,20 +128,20 @@ function processChildren(
 }
 
 function processTextNode(
-  text: string,
+  content: string,
   offset: number,
-  comments: Comment[],
+  anchors: CommentAnchor[],
   activeCommentId: string | null,
   color: string,
   activeColor: string,
 ): { node: React.ReactNode; offset: number } {
-  const length = text.length;
+  const length = content.length;
   const end = offset + length;
 
-  const ranges = getHighlightRangesForTextNode(offset, end, comments);
+  const ranges = getHighlightRangesForTextNode(offset, end, anchors);
 
   if (ranges.length === 0) {
-    return { node: text, offset: end };
+    return { node: content, offset: end };
   }
 
   const nodes: React.ReactNode[] = [];
@@ -168,27 +165,27 @@ function processTextNode(
     const relativeStart = segmentStart - offset;
     const relativeEnd = segmentEnd - offset;
 
-    const segmentText = text.slice(relativeStart, relativeEnd);
+    const segmentText = content.slice(relativeStart, relativeEnd);
 
-    // Find all comments covering this segment
-    const coveringComments = ranges.filter(
+    // Find all anchors covering this segment
+    const coveringAnchors = ranges.filter(
       range => range.start <= segmentStart && range.end >= segmentEnd,
     );
 
-    if (coveringComments.length === 0) {
+    if (coveringAnchors.length === 0) {
       // No highlights, plain text
       nodes.push(segmentText);
     } else {
       // Determine if any covering comment matches activeCommentId
       const isActive = activeCommentId
-        ? coveringComments.some(
+        ? coveringAnchors.some(
             range => range.commentId === activeCommentId,
           )
         : false;
 
       nodes.push(
         <span
-          data-comment-id={coveringComments[0].commentId}
+          data-comment-id={coveringAnchors[0].commentId}
           key={segmentStart}
           style={{
             background: isActive ? activeColor : color,
@@ -209,7 +206,7 @@ function processTextNode(
 function processElementNode(
   element: React.ReactElement,
   offset: number,
-  comments: Comment[],
+  anchors: CommentAnchor[],
   activeCommentId: string | null,
   color: string,
   activeColor: string,
@@ -219,7 +216,7 @@ function processElementNode(
     processChildren(
       children,
       offset,
-      comments,
+      anchors,
       activeCommentId,
       color,
       activeColor,
@@ -237,7 +234,7 @@ function processElementNode(
 function processArrayNode(
   nodes: React.ReactNode[],
   offset: number,
-  comments: Comment[],
+  anchors: CommentAnchor[],
   activeCommentId: string | null,
   color: string,
   activeColor: string,
@@ -249,7 +246,7 @@ function processArrayNode(
     const { node: processedNode, offset: newOffset } = processNode(
       child,
       currentOffset,
-      comments,
+      anchors,
       activeCommentId,
       color,
       activeColor,
@@ -264,14 +261,14 @@ function processArrayNode(
 function getHighlightRangesForTextNode(
   start: number,
   end: number,
-  comments: Comment[],
+  anchors: CommentAnchor[],
 ): { start: number; end: number; commentId: string }[] {
   const ranges: { start: number; end: number; commentId: string }[] =
     [];
 
-  comments.forEach(comment => {
-    const selStart = comment.selectionRange.startOffset;
-    const selEnd = comment.selectionRange.endOffset;
+  anchors.forEach(anchor => {
+    const selStart = anchor.selectionRange.startOffset;
+    const selEnd = anchor.selectionRange.endOffset;
 
     const overlapStart = Math.max(start, selStart);
     const overlapEnd = Math.min(end, selEnd);
@@ -280,7 +277,7 @@ function getHighlightRangesForTextNode(
       ranges.push({
         start: overlapStart,
         end: overlapEnd,
-        commentId: comment.id,
+        commentId: anchor.id,
       });
     }
   });

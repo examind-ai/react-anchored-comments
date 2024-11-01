@@ -20,15 +20,15 @@ const CommentView = ({ commentId, children }: CommentViewProps) => {
 
   const { commentSectionOffsetY, activeCommentId } = state;
 
-  const commentRef = useRef<HTMLDivElement>(null);
+  const viewRef = useRef<HTMLDivElement>(null);
 
   // State to track whether the initial positioning has occurred
   const hasPositionedRef = useRef(false);
 
   const updateHeightAndRecalculate = () => {
-    if (!commentRef.current) return;
+    if (!viewRef.current) return;
 
-    const height = commentRef.current.getBoundingClientRect().height;
+    const height = viewRef.current.getBoundingClientRect().height;
     dispatch({
       type: 'UPDATE_COMMENT_HEIGHT',
       payload: { id: commentId, height },
@@ -42,13 +42,13 @@ const CommentView = ({ commentId, children }: CommentViewProps) => {
 
   // Monitor dynamic height changes
   useLayoutEffect(() => {
-    if (!commentRef.current) return;
+    if (!viewRef.current) return;
 
     const resizeObserver = new ResizeObserver(() => {
       updateHeightAndRecalculate();
     });
 
-    resizeObserver.observe(commentRef.current);
+    resizeObserver.observe(viewRef.current);
 
     return () => {
       resizeObserver.disconnect();
@@ -56,9 +56,9 @@ const CommentView = ({ commentId, children }: CommentViewProps) => {
   }, []);
 
   useEffect(() => {
-    if (!commentRef.current) return;
+    if (!viewRef.current) return;
 
-    const element = commentRef.current;
+    const element = viewRef.current;
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -88,7 +88,7 @@ const CommentView = ({ commentId, children }: CommentViewProps) => {
   }, []);
 
   const onDeleteSuccess = () => {
-    dispatch({ type: 'DELETE_COMMENT', payload: { id: commentId } });
+    dispatch({ type: 'DELETE_ANCHOR', payload: { id: commentId } });
   };
 
   const onFocus = () => {
@@ -110,7 +110,7 @@ const CommentView = ({ commentId, children }: CommentViewProps) => {
 
   return (
     <div
-      ref={commentRef}
+      ref={viewRef}
       tabIndex={isOffScreen ? -1 : 0} // 0 to make div focusable when not off screen
       style={{
         position: 'absolute',

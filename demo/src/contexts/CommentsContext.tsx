@@ -1,3 +1,4 @@
+import { CommentAnchor } from '@examind/react-anchored-comments';
 import {
   createContext,
   ReactNode,
@@ -6,11 +7,13 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { commentsToAnchors } from '../lib/commentToAnchor';
 import { MessageComment } from '../types';
 
 const CommentsContext = createContext<
   | {
       comments: MessageComment[];
+      anchors: CommentAnchor[];
       addComment: (comment: MessageComment) => void;
       deleteComment: (id: string) => void;
       editComment: (id: string, content: string) => void;
@@ -62,14 +65,20 @@ const CommentsProvider = ({
     [setComments],
   );
 
+  const anchors = useMemo(
+    () => commentsToAnchors(comments),
+    [comments],
+  );
+
   const value = useMemo(
     () => ({
       comments,
+      anchors,
       addComment,
       deleteComment,
       editComment,
     }),
-    [comments, editComment, addComment, deleteComment],
+    [comments, anchors, editComment, addComment, deleteComment],
   );
 
   return (

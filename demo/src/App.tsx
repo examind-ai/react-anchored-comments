@@ -15,13 +15,19 @@ import {
   useCommentsContext,
 } from './contexts/CommentsContext';
 import { messages } from './data';
+import { commentsToAnchors } from './lib/commentToAnchor';
 
 const AppLayout = () => {
-  const { comments, addComment, deleteComment, editComment } =
-    useCommentsContext();
+  const {
+    comments,
+    anchors,
+    addComment,
+    deleteComment,
+    editComment,
+  } = useCommentsContext();
 
   return (
-    <AnchoredCommentsProvider comments={comments}>
+    <AnchoredCommentsProvider anchors={anchors}>
       <div className="flex min-h-screen items-start justify-center bg-gray-100 p-4">
         <div className="flex w-full max-w-6xl">
           <div className="relative mr-4 w-2/3 rounded-lg bg-white p-6 shadow-md">
@@ -31,8 +37,10 @@ const AppLayout = () => {
                 <ContentView key={message.id} contentId={message.id}>
                   <MessageBox
                     message={message}
-                    comments={comments.filter(
-                      c => c.messageId === message.id,
+                    anchors={commentsToAnchors(
+                      comments.filter(
+                        c => c.messageId === message.id,
+                      ),
                     )}
                   />
                 </ContentView>
@@ -44,7 +52,7 @@ const AppLayout = () => {
               <NewComment>
                 {({ selectionRange, onAddSuccess, onCancel }) => (
                   <NewCommentForm
-                    handleAddComment={text => {
+                    handleAddComment={content => {
                       const id = Math.random()
                         .toString(36)
                         .substring(2, 12);
@@ -52,7 +60,7 @@ const AppLayout = () => {
                       addComment({
                         id,
                         messageId: selectionRange.contentId,
-                        text,
+                        content,
                         selectionRange,
                       });
                       onAddSuccess(id);
@@ -91,7 +99,7 @@ const App = () => {
         {
           id: 'comment-1',
           messageId: '3',
-          text: 'First comment',
+          content: 'First comment',
           selectionRange: {
             contentId: '3',
             startOffset: 108,
@@ -101,7 +109,7 @@ const App = () => {
         {
           id: 'comment-2',
           messageId: '3',
-          text: 'Another comment',
+          content: 'Another comment',
           selectionRange: {
             contentId: '3',
             startOffset: 325,
@@ -111,7 +119,7 @@ const App = () => {
         {
           id: 'comment-3',
           messageId: '3',
-          text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eu ligula eget enim mollis tincidunt. Proin facilisis odio lectus, at pellentesque mi egestas quis. In hac habitasse platea dictumst. Maecenas vitae accumsan lectus, at porttitor arcu. Suspendisse ornare orci ut mauris varius, at dictum mi rhoncus. Nulla turpis felis, convallis ac vestibulum vel, dignissim vel lorem. Curabitur molestie et ex in dapibus.
+          content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eu ligula eget enim mollis tincidunt. Proin facilisis odio lectus, at pellentesque mi egestas quis. In hac habitasse platea dictumst. Maecenas vitae accumsan lectus, at porttitor arcu. Suspendisse ornare orci ut mauris varius, at dictum mi rhoncus. Nulla turpis felis, convallis ac vestibulum vel, dignissim vel lorem. Curabitur molestie et ex in dapibus.
 
 Proin ac elit metus. Sed sodales convallis aliquet. Nulla pulvinar in est vehicula gravida. Suspendisse scelerisque varius neque. Pellentesque sed dictum ante, sed posuere orci.`,
           selectionRange: {
