@@ -88,10 +88,7 @@ const CommentView = ({ commentId, children }: CommentViewProps) => {
   }, []);
 
   const onDeleteSuccess = () => {
-    dispatch({
-      type: 'ON_DELETE_COMMENT',
-      payload: { id: commentId },
-    });
+    dispatch({ type: 'DELETE_COMMENT', payload: { id: commentId } });
   };
 
   const onFocus = () => {

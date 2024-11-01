@@ -24,9 +24,14 @@ const NewComment = ({
 
   const onAddSuccess = (newCommentId: string) => {
     dispatch({
-      type: 'ON_ADD_COMMENT',
+      type: 'ADD_COMMENT',
       payload: {
         id: newCommentId,
+        selectionRange: {
+          contentId: newComment.selectionRange.contentId,
+          startOffset: newComment.selectionRange.startOffset,
+          endOffset: newComment.selectionRange.endOffset,
+        },
       },
     });
   };

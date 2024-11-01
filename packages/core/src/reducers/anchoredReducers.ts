@@ -68,16 +68,20 @@ export const anchoredReducers = (
     case 'UPDATE_COMMENT_SECTION_OFFSETY':
       return { ...state, commentSectionOffsetY: action.payload };
 
-    case 'ON_ADD_COMMENT':
+    case 'ADD_COMMENT':
       return {
         ...state,
+        comments: [...state.comments, action.payload],
         newComment: null,
         activeCommentId: action.payload.id,
       };
 
-    case 'ON_DELETE_COMMENT':
+    case 'DELETE_COMMENT':
       return {
         ...state,
+        comments: state.comments.filter(
+          comment => comment.id !== action.payload.id,
+        ),
         activeCommentId:
           state.activeCommentId === action.payload.id
             ? null

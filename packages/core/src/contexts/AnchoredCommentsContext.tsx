@@ -52,8 +52,8 @@ export type AnchoredAction =
     }
   | { type: 'UPDATE_CONTENT_SECTION_OFFSETY'; payload: number }
   | { type: 'UPDATE_COMMENT_SECTION_OFFSETY'; payload: number }
-  | { type: 'ON_ADD_COMMENT'; payload: { id: string } }
-  | { type: 'ON_DELETE_COMMENT'; payload: { id: string } }
+  | { type: 'ADD_COMMENT'; payload: Comment }
+  | { type: 'DELETE_COMMENT'; payload: { id: string } }
   | { type: 'SET_COMMENTS'; payload: Comment[] };
 
 type AnchoredCommentsContextType = {
