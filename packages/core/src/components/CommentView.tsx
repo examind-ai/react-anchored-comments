@@ -11,7 +11,7 @@ type RenderPropFn = ({
 
 type CommentViewProps = {
   commentId: string;
-  children: React.ReactNode | RenderPropFn;
+  children: ReactNode | RenderPropFn;
 };
 
 const CommentView = ({ commentId, children }: CommentViewProps) => {

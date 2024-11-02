@@ -2,10 +2,22 @@ import { debounce } from 'lodash';
 import { ReactNode, useCallback, useEffect, useRef } from 'react';
 import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
 
-const CommentSection = ({ children }: { children: ReactNode }) => {
+type RenderPropFn = ({
+  activeCommentId,
+}: {
+  activeCommentId: string | null;
+}) => ReactNode;
+
+const CommentSection = ({
+  children,
+}: {
+  children: ReactNode | RenderPropFn;
+}) => {
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { dispatch } = useAnchoredCommentsContext();
+  const { state, dispatch } = useAnchoredCommentsContext();
+
+  const { activeCommentId } = state;
 
   const setOffset = useCallback(() => {
     if (!sectionRef.current) return;
@@ -32,7 +44,11 @@ const CommentSection = ({ children }: { children: ReactNode }) => {
 
   return (
     <div ref={sectionRef} style={{ position: 'relative' }}>
-      {children}
+      {typeof children === 'function'
+        ? (children as RenderPropFn)({
+            activeCommentId,
+          })
+        : children}
     </div>
   );
 };
