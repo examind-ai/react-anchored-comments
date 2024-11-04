@@ -29,11 +29,11 @@ npm install --save-exact @examind/react-anchored-comments
 
 # or
 
-yarn add @examind/react-anchored-comments
+yarn add --save-exact @examind/react-anchored-comments
 
 # or
 
-pnpm add @examind/react-anchored-comments
+pnpm add --save-exact @examind/react-anchored-comments
 ```
 
 ## Quick Start
