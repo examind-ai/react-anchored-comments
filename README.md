@@ -37,10 +37,47 @@ import {
   Highlight,
   NewComment,
 } from '@examind/react-anchored-comments';
+import type { CommentAnchor } from '@examind/react-anchored-comments';
+
+const commentToAnchor = (comment: MessageComment) =>
+  ({
+    id: comment.id,
+    selectionRange: comment.selectionRange,
+  }) satisfies CommentAnchor;
+
+const commentsToAnchors = (comments: MessageComment[]) =>
+  comments.map(commentToAnchor);
 
 function App() {
+const messages: Message[] = [
+  {
+    id: '1',
+    content:
+      "Hi",
+    role: 'user',
+  },
+  {
+    id: '2',
+    content:
+      '**Hello**, how can I help you today?',
+    role: 'assistant',
+  },
+
+  const comments = [
+    {
+      id: 'comment-1',
+      messageId: '2',
+      content: 'First comment',
+      selectionRange: {
+        contentId: '2',
+        startOffset: 8,
+        endOffset: 20,
+      },
+    } satisfies MessageComment,
+  ];
+
   return (
-    <AnchoredCommentsProvider initialComments={comments}>
+    <AnchoredCommentsProvider anchors={commentsToAnchors(comments)}>
       <ContentSection addIcon={<span>+</span>} iconRight="-3.5rem">
         {messages.map(message => (
           <ContentView key={message.id} contentId={message.id}>
@@ -50,7 +87,11 @@ function App() {
               <Highlight
                 contentId={message.id}
                 markdown={message.content}
-                comments={comments}
+                anchors={commentsToAnchors(
+                  comments.filter(
+                    c => c.messageId === message.id,
+                  ),
+                )}
                 color="#fef2cd"
                 activeColor="#fcbc03"
               />
@@ -109,9 +150,8 @@ Component for positioning each comment. You must provide your own comment render
 
 ```tsx
 import type {
-  CommentPosition,
-  Comment,
-  Selection,
+  CommentAnchor,
+  SelectionRange,
 } from '@examind/react-anchored-comments';
 ```
 
