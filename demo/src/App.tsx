@@ -4,6 +4,7 @@ import {
   CommentView,
   ContentSection,
   ContentView,
+  Highlight,
   NewComment,
 } from '@examind/react-anchored-comments';
 import AddIcon from './components/features/AddIcon';
@@ -35,14 +36,19 @@ const AppLayout = () => {
             <ContentSection addIcon={<AddIcon />} iconRight="-3.5rem">
               {messages.map(message => (
                 <ContentView key={message.id} contentId={message.id}>
-                  <MessageBox
-                    message={message}
-                    anchors={commentsToAnchors(
-                      comments.filter(
-                        c => c.messageId === message.id,
-                      ),
-                    )}
-                  />
+                  <MessageBox message={message}>
+                    <Highlight
+                      contentId={message.id}
+                      markdown={message.content}
+                      anchors={commentsToAnchors(
+                        comments.filter(
+                          c => c.messageId === message.id,
+                        ),
+                      )}
+                      color="#fef2cd"
+                      activeColor="#fcbc03"
+                    />
+                  </MessageBox>
                 </ContentView>
               ))}
             </ContentSection>

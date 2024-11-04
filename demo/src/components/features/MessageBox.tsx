@@ -1,13 +1,12 @@
-import type { CommentAnchor } from '@examind/react-anchored-comments';
-import { Highlight } from '@examind/react-anchored-comments';
+import { ReactNode } from 'react';
 import type { Message } from '../../types';
 
 const MessageBox = ({
   message,
-  anchors,
+  children,
 }: {
   message: Message;
-  anchors: CommentAnchor[];
+  children: ReactNode;
 }) => {
   return (
     <div
@@ -15,13 +14,7 @@ const MessageBox = ({
         message.role === 'assistant' ? 'bg-blue-100' : 'bg-gray-200'
       }`}
     >
-      <Highlight
-        contentId={message.id}
-        markdown={message.content}
-        anchors={anchors}
-        color="#fef2cd"
-        activeColor="#fcbc03"
-      />
+      {children}
     </div>
   );
 };
