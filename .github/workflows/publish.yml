@@ -15,9 +15,9 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
+      - run: npm ci
       - name: Change to package directory
         run: cd packages/core
-      - run: npm ci
       - run: npm run build
       - run: npm publish --access public
         env:
