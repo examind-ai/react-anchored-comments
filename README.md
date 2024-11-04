@@ -224,6 +224,12 @@ npm unlink @examind/react-anchored-comments
 npm unlink
 ```
 
+## Publish
+
+- Bump version in package.json
+- `npm install`
+- Commit with message: `Release {version, e.g. 0.1.6}`
+
 ## Contributing
 
 Contributions are welcome!
