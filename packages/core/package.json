@@ -1,12 +1,17 @@
 {
   "name": "@examind/react-anchored-comments",
   "version": "0.1.1",
+  "readme": "../../README.md",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "ttps://github.com/examind-ai/react-anchored-comments.git"
+  },
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "dev": "tsc --watch --project tsconfig.build.json",
