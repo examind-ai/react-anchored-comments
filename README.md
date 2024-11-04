@@ -2,6 +2,17 @@
 
 A headless React component library for Google Docs-style commenting and markdown highlighting. Provides precise positioning logic and markdown highlighting capabilities while leaving the UI implementation to the consumer.
 
+> ⚠️ **WARNING: Early Alpha Release**
+>
+> This library is in early alpha stage. The API is not stable and may change significantly between versions.
+> To avoid breaking changes, please install a specific version:
+>
+> ```bash
+> npm install --save-exact @examind/react-anchored-comments
+> ```
+>
+> Do not rely on semver ranges (^, ~) until we reach v1.0.0.
+
 ## Features
 
 - 📝 Google Docs-style commenting system
@@ -14,7 +25,7 @@ A headless React component library for Google Docs-style commenting and markdown
 ## Installation
 
 ```bash
-npm install @examind/react-anchored-comments
+npm install --save-exact @examind/react-anchored-comments
 
 # or
 
