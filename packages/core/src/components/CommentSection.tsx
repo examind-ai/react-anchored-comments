@@ -1,6 +1,10 @@
 import { debounce } from 'lodash';
 import { ReactNode, useCallback, useEffect, useRef } from 'react';
 import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
+import {
+  getAbsoluteTop,
+  getTotalScrollOffset,
+} from '../utils/elementPosition';
 
 type RenderPropFn = ({
   activeCommentId,
@@ -22,11 +26,12 @@ const CommentSection = ({
   const setOffset = useCallback(() => {
     if (!sectionRef.current) return;
 
-    const offset =
-      sectionRef.current.getBoundingClientRect().top + window.scrollY;
     dispatch({
       type: 'UPDATE_COMMENT_SECTION_OFFSETY',
-      payload: offset,
+      payload: getAbsoluteTop(
+        sectionRef.current,
+        getTotalScrollOffset(sectionRef.current),
+      ),
     });
   }, [dispatch]);
 
