@@ -113,7 +113,6 @@ const ContentSection = ({
 
     return () => {
       window.clearTimeout(timerRef.current);
-      // debouncedUpdateTextPositions.cancel();
     };
   }, [updateTextPositions]);
 
