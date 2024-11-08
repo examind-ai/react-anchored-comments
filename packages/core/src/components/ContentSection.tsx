@@ -129,103 +129,118 @@ const ContentSection = ({
     };
   }, [debouncedUpdateTextPositions]);
 
-  const handleInteraction = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  ) => {
-    if (!sectionRef.current) return;
+  const handleInteraction = useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      if (!sectionRef.current) return;
 
-    if (!(e.target instanceof HTMLElement)) return;
+      if (!(e.target instanceof HTMLElement)) return;
 
-    // If new comment is showing, don't interfere
-    if (newComment) return;
+      // If new comment is showing, don't interfere
+      if (newComment) return;
 
-    // Check for text selection first
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
+      // Check for text selection first
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
 
-      // If there's an actual selection (not just a click)
-      if (!range.collapsed) {
-        const container =
-          range.commonAncestorContainer instanceof HTMLElement
-            ? range.commonAncestorContainer?.closest(
-                '[data-content-id]',
-              )
-            : // If everything selected is a textnode, then range.commonAncestorContainer won't be HTMLElement
-              range.commonAncestorContainer.parentElement?.closest(
-                '[data-content-id]',
-              );
-        const contentId = container?.getAttribute('data-content-id');
-        const isWithinCommentable =
-          container && sectionRef.current?.contains(container);
+        // If there's an actual selection (not just a click)
+        if (!range.collapsed) {
+          const container =
+            range.commonAncestorContainer instanceof HTMLElement
+              ? range.commonAncestorContainer?.closest(
+                  '[data-content-id]',
+                )
+              : // If everything selected is a textnode, then range.commonAncestorContainer won't be HTMLElement
+                range.commonAncestorContainer.parentElement?.closest(
+                  '[data-content-id]',
+                );
+          const contentId =
+            container?.getAttribute('data-content-id');
+          const isWithinCommentable =
+            container && sectionRef.current?.contains(container);
 
-        if (!contentId || !isWithinCommentable) {
+          if (!contentId || !isWithinCommentable) {
+            dispatch({
+              type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
+              payload: { activeCommentId: null, selection: null },
+            });
+            return;
+          }
+
+          const startOffset = getOffsetInTextContent(
+            container,
+            range.startContainer,
+            range.startOffset,
+          );
+          const endOffset = getOffsetInTextContent(
+            container,
+            range.endContainer,
+            range.endOffset,
+          );
+
+          const positionTop = getAbsoluteTop(
+            range,
+            getTotalScrollOffset(sectionRef.current),
+          );
+
           dispatch({
             type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
-            payload: { activeCommentId: null, selection: null },
+            payload: {
+              activeCommentId: null,
+              selection: {
+                startOffset,
+                endOffset,
+                contentId,
+                positionTop,
+              },
+            },
           });
           return;
         }
+      }
 
-        const startOffset = getOffsetInTextContent(
-          container,
-          range.startContainer,
-          range.startOffset,
-        );
-        const endOffset = getOffsetInTextContent(
-          container,
-          range.endContainer,
-          range.endOffset,
-        );
+      // If we get here, it means either:
+      // 1. There was no selection at all
+      // 2. The selection was collapsed (just a click)
 
-        const positionTop = getAbsoluteTop(
-          range,
-          getTotalScrollOffset(sectionRef.current),
-        );
-
+      // Check if clicking on a comment
+      const commentId = e.target.getAttribute('data-comment-id');
+      if (commentId) {
+        e.stopPropagation();
         dispatch({
           type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
-          payload: {
-            activeCommentId: null,
-            selection: {
-              startOffset,
-              endOffset,
-              contentId,
-              positionTop,
-            },
-          },
+          payload: { activeCommentId: commentId, selection: null },
         });
         return;
       }
-    }
 
-    // If we get here, it means either:
-    // 1. There was no selection at all
-    // 2. The selection was collapsed (just a click)
-
-    // Check if clicking on a comment
-    const commentId = e.target.getAttribute('data-comment-id');
-    if (commentId) {
-      e.stopPropagation();
+      // Clicked on a non-comment area
       dispatch({
         type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
-        payload: { activeCommentId: commentId, selection: null },
+        payload: { activeCommentId: null, selection: null },
       });
-      return;
-    }
+    },
+    [[newComment, dispatch]],
+  );
 
-    // Clicked on a non-comment area
-    dispatch({
-      type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
-      payload: { activeCommentId: null, selection: null },
-    });
-  };
+  useEffect(() => {
+    const handleDocumentMouseUp = (e: MouseEvent) => {
+      handleInteraction(
+        e as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>,
+      );
+    };
+
+    document.addEventListener('mouseup', handleDocumentMouseUp);
+
+    return () => {
+      document.removeEventListener('mouseup', handleDocumentMouseUp);
+    };
+  }, [handleInteraction]);
 
   return (
     <div
       ref={sectionRef}
       style={{ position: 'relative', height: 'inherit' }}
-      onMouseUp={handleInteraction}
     >
       {children}
       <NewCommentTrigger
