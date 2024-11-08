@@ -34,7 +34,7 @@ const ContentSection = ({
 
   const { newComment, anchors } = state;
 
-  // Function to set the offset of the commentable section
+  // Function to set the offset of the content section
   const setOffset = useCallback(() => {
     if (!sectionRef.current) return;
 
@@ -156,10 +156,10 @@ const ContentSection = ({
                 );
           const contentId =
             container?.getAttribute('data-content-id');
-          const isWithinCommentable =
+          const isWithinContentSection =
             container && sectionRef.current?.contains(container);
 
-          if (!contentId || !isWithinCommentable) {
+          if (!contentId || !isWithinContentSection) {
             dispatch({
               type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
               payload: { activeCommentId: null, selection: null },
