@@ -241,6 +241,7 @@ function processTextNode(
           key={segmentStart}
           style={{
             background: isActive ? activeColor : color,
+            padding: '1.3px 0', // Prevent vertical color gap between multiple lines that are highlighted
           }}
         >
           {segmentText}
