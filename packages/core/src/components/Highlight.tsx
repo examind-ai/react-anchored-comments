@@ -1,31 +1,9 @@
 import parse from 'html-react-parser';
-import { marked, Tokens } from 'marked';
+import { marked } from 'marked';
 import React, { useEffect, useState } from 'react';
 import { NEW_COMMENT_ID } from '../constants';
 import { useAnchoredCommentsContext } from '../contexts/AnchoredCommentsContext';
 import { CommentAnchor } from '../types';
-
-// In order to get blinking caret effect when typing is true, consuming code needs to import a css file with this:
-// .typing:last-child::after {
-//   content: '';
-//   display: inline-block;
-//   background-color: #a4a4a4;
-//   width: 12px;
-//   height: 17px; /* Going higher then 17px changes line height of the text */
-//   animation: carat_blink 1s infinite;
-//   margin-left: 4px;
-//   vertical-align: -3px;
-// }
-
-// @keyframes carat_blink {
-//   0%,
-//   100% {
-//     opacity: 0;
-//   }
-//   50% {
-//     opacity: 1;
-//   }
-// }
 
 const Highlight = ({
   contentId,
@@ -33,14 +11,12 @@ const Highlight = ({
   anchors,
   color,
   activeColor,
-  typing,
 }: {
   contentId: string;
   markdown: string;
   anchors: CommentAnchor[];
   color: string;
   activeColor: string;
-  typing?: boolean;
 }) => {
   const [result, setResult] = useState<{ node: React.ReactNode }>({
     node: null,
@@ -61,22 +37,7 @@ const Highlight = ({
       });
 
     const processMarkdown = async () => {
-      const content = typing
-        ? markdown + '*magic-string-typing*'
-        : markdown;
-
-      // Create a custom renderer
-      const renderer = new marked.Renderer();
-      const originalEm = renderer.em.bind(renderer);
-
-      renderer.em = function (token: Tokens.Em): string {
-        if (token.text === 'magic-string-typing') {
-          return '<span class="typing"></span>';
-        }
-        return originalEm(token);
-      };
-
-      const htmlContent = await marked(content, { renderer });
+      const htmlContent = await marked(markdown);
       const reactElements = parse(htmlContent);
       const result = processChildren(
         reactElements,
@@ -90,7 +51,7 @@ const Highlight = ({
     };
 
     processMarkdown();
-  }, [setResult, markdown, anchors, activeCommentId, typing]);
+  }, [setResult, markdown, anchors, activeCommentId]);
 
   return <>{result.node}</>;
 };
@@ -115,10 +76,6 @@ function processNode(
       activeColor,
     );
   } else if (React.isValidElement(node)) {
-    if (node.props.className === 'typing') {
-      return { node, offset };
-    }
-
     return processElementNode(
       node,
       offset,
@@ -150,23 +107,14 @@ function processChildren(
   activeColor: string,
 ): { node: React.ReactNode; offset: number } {
   if (Array.isArray(children)) {
-    const processedNodes: React.ReactNode[] = [];
-    let currentOffset = offset;
-
-    children.forEach(child => {
-      const { node: processedNode, offset: newOffset } = processNode(
-        child,
-        currentOffset,
-        anchors,
-        activeCommentId,
-        color,
-        activeColor,
-      );
-      processedNodes.push(processedNode);
-      currentOffset = newOffset;
-    });
-
-    return { node: processedNodes, offset: currentOffset };
+    return processArrayNode(
+      children,
+      offset,
+      anchors,
+      activeCommentId,
+      color,
+      activeColor,
+    );
   } else {
     return processNode(
       children,
