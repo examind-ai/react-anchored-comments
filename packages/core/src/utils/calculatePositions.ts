@@ -1,4 +1,3 @@
-import { COMMENT_OVERLAP_GAP } from '../constants';
 import { Positions } from '../types';
 
 /**
@@ -44,6 +43,7 @@ export const calculatePositions = (
   activeCommentId: string | null,
   visibleComments: Set<string>,
   commentHeights: Record<string, number>,
+  commentOverlapGap: number,
 ): Positions => {
   const newPositions: Positions = {};
 
@@ -78,7 +78,7 @@ export const calculatePositions = (
         const prevHeight = getCommentHeight(prevId);
 
         // Calculate the minimum top position to prevent overlap with previous comment
-        const minTop = prevTop + prevHeight + COMMENT_OVERLAP_GAP;
+        const minTop = prevTop + prevHeight + commentOverlapGap;
 
         // Adjust current comment's position downwards as needed
         const adjustedTop = Math.max(desiredTop, minTop);
@@ -100,7 +100,7 @@ export const calculatePositions = (
       const prevHeight = getCommentHeight(prevId);
 
       // Calculate the minimum top position to prevent overlap
-      const minTop = prevTop + prevHeight + COMMENT_OVERLAP_GAP;
+      const minTop = prevTop + prevHeight + commentOverlapGap;
 
       // Adjust current comment's position downwards as needed
       const adjustedTop = Math.max(desiredTop, minTop);
@@ -122,11 +122,11 @@ export const calculatePositions = (
 
       // Check for overlap with the comment below
       let overlap =
-        currentTop + currentHeight + COMMENT_OVERLAP_GAP > nextTop;
+        currentTop + currentHeight + commentOverlapGap > nextTop;
 
       if (overlap) {
         // Adjust upwards as little as possible to prevent overlap
-        currentTop = nextTop - currentHeight - COMMENT_OVERLAP_GAP;
+        currentTop = nextTop - currentHeight - commentOverlapGap;
         finalPositions[currentId] = currentTop;
 
         // Propagate adjustment upwards if necessary
@@ -138,11 +138,11 @@ export const calculatePositions = (
 
           // Check for overlap
           overlap =
-            aboveTop + aboveHeight + COMMENT_OVERLAP_GAP > currentTop;
+            aboveTop + aboveHeight + commentOverlapGap > currentTop;
 
           if (overlap) {
             // Adjust the above comment upwards
-            aboveTop = currentTop - aboveHeight - COMMENT_OVERLAP_GAP;
+            aboveTop = currentTop - aboveHeight - commentOverlapGap;
             finalPositions[aboveId] = aboveTop;
 
             // Move up the chain
@@ -173,7 +173,7 @@ export const calculatePositions = (
         const prevHeight = getCommentHeight(prevId);
 
         // Calculate the minimum top position to prevent overlap
-        const minTop = prevTop + prevHeight + COMMENT_OVERLAP_GAP;
+        const minTop = prevTop + prevHeight + commentOverlapGap;
 
         // Adjust current comment's position downwards as needed
         const adjustedTop = Math.max(desiredTop, minTop);

@@ -65,6 +65,15 @@ type AnchoredCommentsContextType = {
   // Adjusted positions for CommentViews in CommentSection.
   // Since commentPositions depends on DOM measurements, we'll manage them separate from the main state
   commentPositions: Positions;
+  settings: {
+    highlight: {
+      color: string;
+      activeColor: string;
+      paddingY: string;
+    };
+    commentOverlapGap: number;
+    addCommentIconPositionRight: string;
+  };
 };
 
 const AnchoredCommentsContext =
@@ -73,10 +82,39 @@ const AnchoredCommentsContext =
 export const AnchoredCommentsProvider = ({
   anchors,
   children,
+  settings = {},
 }: {
   anchors: CommentAnchor[];
   children: ReactNode;
+  settings?: {
+    highlight?: {
+      color?: string;
+      activeColor?: string;
+      paddingY?: string;
+    };
+    commentOverlapGap?: number;
+    addCommentIconPositionRight?: string;
+  };
 }) => {
+  const defaultSettings = {
+    highlight: {
+      color: '#fef2cd',
+      activeColor: '#fcbc03',
+      paddingY: '1.2px',
+    },
+    commentOverlapGap: 10,
+    addCommentIconPositionRight: '-3.5rem',
+  };
+
+  const mergedSettings = {
+    ...defaultSettings,
+    ...settings,
+    highlight: {
+      ...defaultSettings.highlight,
+      ...settings.highlight,
+    },
+  };
+
   const [state, dispatch] = useReducer(anchoredReducers, {
     contentSectionOffsetY: 0,
     commentSectionOffsetY: 0,
@@ -125,6 +163,7 @@ export const AnchoredCommentsProvider = ({
       state.activeCommentId,
       visibleComments,
       state.commentHeights,
+      mergedSettings.commentOverlapGap,
     );
 
     setCommentPositions(positions);
@@ -143,6 +182,7 @@ export const AnchoredCommentsProvider = ({
         dispatch,
         contentViews,
         commentPositions,
+        settings: mergedSettings,
       }}
     >
       {children}

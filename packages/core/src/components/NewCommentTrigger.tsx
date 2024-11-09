@@ -8,13 +8,11 @@ import {
 const NewCommentTrigger = ({
   contentSectionRef,
   children,
-  right,
 }: {
   contentSectionRef: React.RefObject<HTMLDivElement>;
   children: ReactNode;
-  right: string;
 }) => {
-  const { state, dispatch } = useAnchoredCommentsContext();
+  const { state, dispatch, settings } = useAnchoredCommentsContext();
   const { selection } = state;
 
   if (!selection) return null;
@@ -41,7 +39,7 @@ const NewCommentTrigger = ({
         top: `${
           (selection.positionTop ?? 0) - contentSectionAbsoluteTop
         }px`,
-        right,
+        right: settings.addCommentIconPositionRight,
         zIndex: 100,
       }}
     >
