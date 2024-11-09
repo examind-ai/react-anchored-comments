@@ -136,6 +136,9 @@ const ContentSection = ({
       // If new comment is showing, don't interfere
       if (newComment) return;
 
+      // Ignore clicks or selections inside CommentView, otherwise we'll deactivate the comment right after CommentView activates it
+      if (e.target.closest('[data-comment-view]')) return;
+
       // Check for text selection first
       const selection = window.getSelection();
       if (selection && selection.rangeCount > 0) {

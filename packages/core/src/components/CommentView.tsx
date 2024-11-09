@@ -111,6 +111,7 @@ const CommentView = ({ commentId, children }: CommentViewProps) => {
   return (
     <div
       ref={viewRef}
+      data-comment-view="" // Needed by ContentSection's handleInteraction to ignore clicks on CommentView
       tabIndex={isOffScreen ? -1 : 0} // 0 to make div focusable when not off screen
       style={{
         position: 'absolute',
