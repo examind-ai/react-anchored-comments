@@ -33,7 +33,7 @@ const AppLayout = () => {
         <div className="flex w-full max-w-6xl">
           <div className="relative mr-4 w-2/3 rounded-lg bg-white p-6 shadow-md">
             <h2 className="mb-4 text-2xl font-bold">AI Chat</h2>
-            <ContentSection addIcon={<AddIcon />} iconRight="-3.5rem">
+            <ContentSection addIcon={<AddIcon />}>
               {messages.map(message => (
                 <ContentView key={message.id} contentId={message.id}>
                   <MessageBox message={message}>
@@ -45,8 +45,6 @@ const AppLayout = () => {
                           c => c.messageId === message.id,
                         ),
                       )}
-                      color="#fef2cd"
-                      activeColor="#fcbc03"
                     />
                   </MessageBox>
                 </ContentView>

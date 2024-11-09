@@ -9,20 +9,16 @@ const Highlight = ({
   contentId,
   markdown,
   anchors,
-  color,
-  activeColor,
 }: {
   contentId: string;
   markdown: string;
   anchors: CommentAnchor[];
-  color: string;
-  activeColor: string;
 }) => {
   const [result, setResult] = useState<{ node: React.ReactNode }>({
     node: null,
   });
 
-  const { state } = useAnchoredCommentsContext();
+  const { state, settings } = useAnchoredCommentsContext();
 
   const { newComment, activeCommentId } = state;
 
@@ -44,8 +40,9 @@ const Highlight = ({
         0,
         allAnchors,
         activeCommentId,
-        color,
-        activeColor,
+        settings.highlight.color,
+        settings.highlight.activeColor,
+        settings.highlight.paddingY,
       );
       setResult(result);
     };
@@ -65,6 +62,7 @@ function processNode(
   activeCommentId: string | null,
   color: string,
   activeColor: string,
+  paddingY: string,
 ): { node: React.ReactNode; offset: number } {
   if (typeof node === 'string') {
     return processTextNode(
@@ -74,6 +72,7 @@ function processNode(
       activeCommentId,
       color,
       activeColor,
+      paddingY,
     );
   } else if (React.isValidElement(node)) {
     return processElementNode(
@@ -83,6 +82,7 @@ function processNode(
       activeCommentId,
       color,
       activeColor,
+      paddingY,
     );
   } else if (Array.isArray(node)) {
     return processArrayNode(
@@ -92,6 +92,7 @@ function processNode(
       activeCommentId,
       color,
       activeColor,
+      paddingY,
     );
   } else {
     return { node, offset };
@@ -105,6 +106,7 @@ function processChildren(
   activeCommentId: string | null,
   color: string,
   activeColor: string,
+  paddingY: string,
 ): { node: React.ReactNode; offset: number } {
   if (Array.isArray(children)) {
     return processArrayNode(
@@ -114,6 +116,7 @@ function processChildren(
       activeCommentId,
       color,
       activeColor,
+      paddingY,
     );
   } else {
     return processNode(
@@ -123,6 +126,7 @@ function processChildren(
       activeCommentId,
       color,
       activeColor,
+      paddingY,
     );
   }
 }
@@ -134,6 +138,7 @@ function processTextNode(
   activeCommentId: string | null,
   color: string,
   activeColor: string,
+  paddingY: string,
 ): { node: React.ReactNode; offset: number } {
   const length = content.length;
   const end = offset + length;
@@ -189,7 +194,7 @@ function processTextNode(
           key={segmentStart}
           style={{
             background: isActive ? activeColor : color,
-            padding: '1.2px 0', // Prevent vertical color gap between multiple lines that are highlighted
+            padding: `${paddingY} 0`, // Increase paddingY to prevent vertical color gap between multiple lines that are highlighted
           }}
         >
           {segmentText}
@@ -211,6 +216,7 @@ function processElementNode(
   activeCommentId: string | null,
   color: string,
   activeColor: string,
+  paddingY: string,
 ): { node: React.ReactNode; offset: number } {
   const { children } = element.props;
   const { node: processedChildren, offset: newOffset } =
@@ -221,6 +227,7 @@ function processElementNode(
       activeCommentId,
       color,
       activeColor,
+      paddingY,
     );
 
   return {
@@ -239,6 +246,7 @@ function processArrayNode(
   activeCommentId: string | null,
   color: string,
   activeColor: string,
+  paddingY: string,
 ): { node: React.ReactNode[]; offset: number } {
   const processedNodes: React.ReactNode[] = [];
   let currentOffset = offset;
@@ -251,6 +259,7 @@ function processArrayNode(
       activeCommentId,
       color,
       activeColor,
+      paddingY,
     );
     processedNodes.push(processedNode);
     currentOffset = newOffset;

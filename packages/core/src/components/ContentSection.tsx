@@ -19,11 +19,9 @@ import NewCommentTrigger from './NewCommentTrigger';
 const ContentSection = ({
   children,
   addIcon,
-  iconRight,
 }: {
   children: ReactNode;
   addIcon: ReactNode;
-  iconRight: string;
 }) => {
   const timerRef = useRef<number>();
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -243,10 +241,7 @@ const ContentSection = ({
       style={{ position: 'relative', height: 'inherit' }}
     >
       {children}
-      <NewCommentTrigger
-        contentSectionRef={sectionRef}
-        right={iconRight}
-      >
+      <NewCommentTrigger contentSectionRef={sectionRef}>
         {addIcon}
       </NewCommentTrigger>
     </div>
