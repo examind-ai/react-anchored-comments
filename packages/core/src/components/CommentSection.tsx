@@ -48,7 +48,10 @@ const CommentSection = ({
   }, [setOffset]);
 
   return (
-    <div ref={sectionRef} style={{ position: 'relative' }}>
+    <div
+      ref={sectionRef}
+      style={{ position: 'relative', width: '100%' }}
+    >
       {typeof children === 'function'
         ? (children as RenderPropFn)({
             activeCommentId,
