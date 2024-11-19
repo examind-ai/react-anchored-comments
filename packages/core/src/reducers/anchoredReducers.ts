@@ -23,6 +23,10 @@ export const anchoredReducers = (
         ...state,
         activeCommentId: action.payload.activeCommentId,
         selection: action.payload.selection,
+        // Clear newComment when selection is cleared
+        ...(action.payload.selection === null && {
+          newComment: null,
+        }),
       };
 
     case 'SHOW_NEW_COMMENT':
@@ -99,6 +103,17 @@ export const anchoredReducers = (
       return {
         ...state,
         anchors: action.payload,
+      };
+
+    case 'SET_DISABLED':
+      return {
+        ...state,
+        disabled: action.payload,
+        // Clear selection and newComment when disabling
+        ...(action.payload && {
+          selection: null,
+          newComment: null,
+        }),
       };
 
     default:

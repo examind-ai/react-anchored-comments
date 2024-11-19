@@ -146,6 +146,10 @@ const ContentSection = ({
 
         // If there's an actual selection (not just a click)
         if (!range.collapsed) {
+          // Put the disabled check here instead of earlier, because we still want the NewCommentTrigger button
+          // to disappear a non selection click happens
+          if (state.disabled) return;
+
           const container =
             range.commonAncestorContainer instanceof HTMLElement
               ? range.commonAncestorContainer?.closest(
@@ -221,7 +225,7 @@ const ContentSection = ({
         payload: { activeCommentId: null, selection: null },
       });
     },
-    [[newComment, dispatch]],
+    [newComment, dispatch, state.disabled],
   );
 
   useEffect(() => {

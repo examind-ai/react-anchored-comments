@@ -7,6 +7,7 @@ import {
   Highlight,
   NewComment,
 } from '@examind/react-anchored-comments';
+import { useState } from 'react';
 import AddIcon from './components/features/AddIcon';
 import CommentBox from './components/features/CommentBox';
 import { NewCommentForm } from './components/features/CommentForm';
@@ -27,12 +28,31 @@ const AppLayout = () => {
     editComment,
   } = useCommentsContext();
 
+  const [disabled, setDisabled] = useState(false);
+
   return (
-    <AnchoredCommentsProvider anchors={anchors}>
+    <AnchoredCommentsProvider anchors={anchors} disabled={disabled}>
       <div className="flex min-h-screen items-start justify-center bg-gray-100 p-4">
         <div className="flex w-full max-w-6xl">
           <div className="relative mr-4 w-2/3 rounded-lg bg-white p-6 shadow-md">
-            <h2 className="mb-4 text-2xl font-bold">AI Chat</h2>
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-bold">AI Chat</h2>
+              <button
+                onClick={() => setDisabled(!disabled)}
+                className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                  disabled
+                    ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                } `}
+              >
+                <span className="text-lg leading-none">
+                  {disabled ? '💬' : '🚫'}
+                </span>
+                <span>
+                  {disabled ? 'Enable Comments' : 'Disable Comments'}
+                </span>
+              </button>
+            </div>
             <ContentSection addIcon={<AddIcon />}>
               {messages.map(message => (
                 <ContentView key={message.id} contentId={message.id}>
