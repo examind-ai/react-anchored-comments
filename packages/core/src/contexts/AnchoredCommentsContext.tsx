@@ -19,6 +19,7 @@ export type AnchoredState = {
   textPositions: Positions; // Positions of text anchors in ContentView
   commentHeights: Record<string, number>; // Heights of CommentViews
   selection: PositionedSelectionRange | null; // Represents current selection in ContentSection
+  selectionSpansMultipleContents: boolean;
   newComment: {
     id: string;
     selectionRange: PositionedSelectionRange;
@@ -39,6 +40,7 @@ export type AnchoredAction =
       payload: {
         activeCommentId: string | null;
         selection: PositionedSelectionRange | null;
+        selectionSpansMultipleContents?: boolean;
       };
     }
   | { type: 'SHOW_NEW_COMMENT' }
@@ -126,6 +128,7 @@ export const AnchoredCommentsProvider = ({
     textPositions: {},
     commentHeights: {},
     selection: null,
+    selectionSpansMultipleContents: false,
     newComment: null,
     anchors,
     disabled,

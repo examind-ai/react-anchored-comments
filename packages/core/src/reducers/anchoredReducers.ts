@@ -16,13 +16,19 @@ export const anchoredReducers = (
       };
 
     case 'SET_SELECTION':
-      return { ...state, selection: action.payload };
+      return {
+        ...state,
+        selection: action.payload,
+        selectionSpansMultipleContents: false,
+      };
 
     case 'SET_ACTIVE_COMMENT_AND_SELECTION':
       return {
         ...state,
         activeCommentId: action.payload.activeCommentId,
         selection: action.payload.selection,
+        selectionSpansMultipleContents:
+          action.payload.selectionSpansMultipleContents ?? false,
         // Clear newComment when selection is cleared
         ...(action.payload.selection === null && {
           newComment: null,
@@ -39,12 +45,14 @@ export const anchoredReducers = (
         },
         activeCommentId: 'new',
         selection: null,
+        selectionSpansMultipleContents: false,
       };
 
     case 'CANCEL_NEW_COMMENT':
       return {
         ...state,
         newComment: null,
+        selectionSpansMultipleContents: false,
         activeCommentId:
           state.activeCommentId === 'new'
             ? null
@@ -77,6 +85,7 @@ export const anchoredReducers = (
         ...state,
         anchors: [...state.anchors, action.payload],
         newComment: null,
+        selectionSpansMultipleContents: false,
         activeCommentId: action.payload.id,
       };
 
@@ -109,6 +118,7 @@ export const anchoredReducers = (
       return {
         ...state,
         disabled: action.payload,
+        selectionSpansMultipleContents: false,
         // Clear selection and newComment when disabling
         ...(action.payload && {
           selection: null,

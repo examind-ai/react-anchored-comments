@@ -146,21 +146,47 @@ const ContentSection = ({
 
         // If there's an actual selection (not just a click)
         if (!range.collapsed) {
-          // Put the disabled check here instead of earlier, because we still want the NewCommentTrigger button
-          // to disappear a non selection click happens
           if (state.disabled) return;
 
-          const container =
-            range.commonAncestorContainer instanceof HTMLElement
-              ? range.commonAncestorContainer?.closest(
-                  '[data-content-id]',
-                )
-              : // If everything selected is a textnode, then range.commonAncestorContainer won't be HTMLElement
-                range.commonAncestorContainer.parentElement?.closest(
+          // Check if selection spans multiple content sections
+          const startContainer =
+            range.startContainer instanceof HTMLElement
+              ? range.startContainer?.closest('[data-content-id]')
+              : range.startContainer.parentElement?.closest(
                   '[data-content-id]',
                 );
-          const contentId =
-            container?.getAttribute('data-content-id');
+
+          const endContainer =
+            range.endContainer instanceof HTMLElement
+              ? range.endContainer?.closest('[data-content-id]')
+              : range.endContainer.parentElement?.closest(
+                  '[data-content-id]',
+                );
+
+          const startContentId =
+            startContainer?.getAttribute('data-content-id');
+          const endContentId =
+            endContainer?.getAttribute('data-content-id');
+
+          const spansMultiple =
+            !!startContentId &&
+            !!endContentId &&
+            startContentId !== endContentId;
+
+          if (!startContentId || !endContentId || spansMultiple) {
+            dispatch({
+              type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
+              payload: {
+                activeCommentId: null,
+                selection: null,
+                selectionSpansMultipleContents: spansMultiple,
+              },
+            });
+            return;
+          }
+
+          const container = startContainer;
+          const contentId = startContentId;
           const isWithinContentSection =
             container && sectionRef.current?.contains(container);
 
@@ -198,6 +224,7 @@ const ContentSection = ({
                 contentId,
                 positionTop,
               },
+              spansMultipleContents: false,
             },
           });
           return;
@@ -222,7 +249,11 @@ const ContentSection = ({
       // Clicked on a non-comment area
       dispatch({
         type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
-        payload: { activeCommentId: null, selection: null },
+        payload: {
+          activeCommentId: null,
+          selection: null,
+          selectionSpansMultipleContents: false,
+        },
       });
     },
     [newComment, dispatch, state.disabled],
