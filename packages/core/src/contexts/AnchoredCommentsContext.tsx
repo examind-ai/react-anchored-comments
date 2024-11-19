@@ -25,6 +25,7 @@ export type AnchoredState = {
     height?: number;
   } | null;
   anchors: CommentAnchor[];
+  disabled: boolean;
 };
 
 export type AnchoredAction =
@@ -54,7 +55,8 @@ export type AnchoredAction =
   | { type: 'UPDATE_COMMENT_SECTION_OFFSETY'; payload: number }
   | { type: 'ADD_ANCHOR'; payload: CommentAnchor }
   | { type: 'DELETE_ANCHOR'; payload: { id: string } }
-  | { type: 'SET_ANCHORS'; payload: CommentAnchor[] };
+  | { type: 'SET_ANCHORS'; payload: CommentAnchor[] }
+  | { type: 'SET_DISABLED'; payload: boolean };
 
 type AnchoredCommentsContextType = {
   state: AnchoredState;
@@ -83,6 +85,7 @@ export const AnchoredCommentsProvider = ({
   anchors,
   children,
   settings = {},
+  disabled = false,
 }: {
   anchors: CommentAnchor[];
   children: ReactNode;
@@ -95,6 +98,7 @@ export const AnchoredCommentsProvider = ({
     commentOverlapGap?: number;
     addCommentIconPositionRight?: string;
   };
+  disabled?: boolean;
 }) => {
   const defaultSettings = {
     highlight: {
@@ -124,6 +128,7 @@ export const AnchoredCommentsProvider = ({
     selection: null,
     newComment: null,
     anchors,
+    disabled,
   });
 
   const contentViews = useRef<
@@ -174,6 +179,16 @@ export const AnchoredCommentsProvider = ({
     state.activeCommentId,
     state.commentHeights,
   ]);
+
+  useEffect(() => {
+    if (disabled)
+      dispatch({
+        type: 'SET_ACTIVE_COMMENT_AND_SELECTION',
+        payload: { activeCommentId: null, selection: null },
+      });
+
+    dispatch({ type: 'SET_DISABLED', payload: disabled });
+  }, [disabled]);
 
   return (
     <AnchoredCommentsContext.Provider
