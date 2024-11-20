@@ -224,7 +224,7 @@ const ContentSection = ({
                 contentId,
                 positionTop,
               },
-              spansMultipleContents: false,
+              selectionSpansMultipleContents: false,
             },
           });
           return;
