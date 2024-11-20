@@ -19,6 +19,7 @@ export type AnchoredState = {
   textPositions: Positions; // Positions of text anchors in ContentView
   commentHeights: Record<string, number>; // Heights of CommentViews
   selection: PositionedSelectionRange | null; // Represents current selection in ContentSection
+  selectionSpansMultipleContents: boolean;
   newComment: {
     id: string;
     selectionRange: PositionedSelectionRange;
@@ -39,6 +40,7 @@ export type AnchoredAction =
       payload: {
         activeCommentId: string | null;
         selection: PositionedSelectionRange | null;
+        selectionSpansMultipleContents?: boolean;
       };
     }
   | { type: 'SHOW_NEW_COMMENT' }
@@ -81,6 +83,10 @@ type AnchoredCommentsContextType = {
 const AnchoredCommentsContext =
   createContext<AnchoredCommentsContextType | null>(null);
 
+type RenderPropFn = (props: {
+  selectionSpansMultipleContents: boolean;
+}) => ReactNode;
+
 export const AnchoredCommentsProvider = ({
   anchors,
   children,
@@ -88,7 +94,7 @@ export const AnchoredCommentsProvider = ({
   disabled = false,
 }: {
   anchors: CommentAnchor[];
-  children: ReactNode;
+  children: ReactNode | RenderPropFn;
   settings?: {
     highlight?: {
       color?: string;
@@ -126,6 +132,7 @@ export const AnchoredCommentsProvider = ({
     textPositions: {},
     commentHeights: {},
     selection: null,
+    selectionSpansMultipleContents: false,
     newComment: null,
     anchors,
     disabled,
@@ -200,7 +207,12 @@ export const AnchoredCommentsProvider = ({
         settings: mergedSettings,
       }}
     >
-      {children}
+      {typeof children === 'function'
+        ? children({
+            selectionSpansMultipleContents:
+              state.selectionSpansMultipleContents,
+          })
+        : children}
     </AnchoredCommentsContext.Provider>
   );
 };
