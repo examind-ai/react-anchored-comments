@@ -72,6 +72,33 @@ const ContentSection = ({
 
         if (!startPosition || !endPosition) return acc;
 
+        // Validate that the offsets are valid before creating a range.
+        // This prevents the "Uncaught IndexSizeError: Failed to execute 'setEnd' on 'Range': The offset 4294967295 is larger than the node's length (241)."" error
+        // which occurs when an invalid offset is passed to range.setEnd() or range.setStart()
+        //
+        // The error specifically happens when:
+        // 1. A negative offset (like -1) exists in a comment's selectionRange
+        //    (This can happen if getOffsetInTextContent() fails to find the target node)
+        // 2. An offset exceeds the length of its text node
+        //    (This can happen if DOM content has changed since the comment was created)
+        //
+        // To reproduce this error: Set a comment's selectionRange.endOffset to -1
+        // When interpreted as an unsigned integer, -1 becomes 4294967295, which is
+        // much larger than any node's length, causing the DOM API to throw an error.
+        if (
+          startPosition.offset < 0 ||
+          endPosition.offset < 0 ||
+          startPosition.offset > startPosition.node.length ||
+          endPosition.offset > endPosition.node.length
+        ) {
+          console.warn(
+            `Invalid range for comment ${comment.id}: ` +
+              `startOffset=${startPosition.offset}, nodeLength=${startPosition.node.length}, ` +
+              `endOffset=${endPosition.offset}, nodeLength=${endPosition.node.length}`,
+          );
+          return acc;
+        }
+
         const range = document.createRange();
         range.setStart(startPosition.node, startPosition.offset);
         range.setEnd(endPosition.node, endPosition.offset);
