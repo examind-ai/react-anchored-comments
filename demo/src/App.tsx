@@ -73,6 +73,7 @@ const AppLayout = () => {
                               c => c.messageId === message.id,
                             ),
                           )}
+                          markedOptions={{ gfm: true, breaks: true }}
                         />
                       </MessageBox>
                     </ContentView>

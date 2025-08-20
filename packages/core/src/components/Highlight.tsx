@@ -9,10 +9,12 @@ const Highlight = ({
   contentId,
   markdown,
   anchors,
+  markedOptions,
 }: {
   contentId: string;
   markdown: string;
   anchors: CommentAnchor[];
+  markedOptions?: { gfm?: boolean; breaks?: boolean };
 }) => {
   const [result, setResult] = useState<{ node: React.ReactNode }>({
     node: null,
@@ -21,6 +23,11 @@ const Highlight = ({
   const { state, settings } = useAnchoredCommentsContext();
 
   const { newComment, activeCommentId } = state;
+
+  // Derive stable primitive options (possibly undefined) to avoid
+  // object identity churn and preserve marked's own defaults when not provided
+  const gfm = markedOptions?.gfm;
+  const breaks = markedOptions?.breaks;
 
   useEffect(() => {
     // Collect all anchors to be highlighted
@@ -33,7 +40,11 @@ const Highlight = ({
       });
 
     const processMarkdown = async () => {
-      const htmlContent = await marked(markdown);
+      // https://marked.js.org/using_advanced
+      const options: { gfm?: boolean; breaks?: boolean } = {};
+      if (gfm !== undefined) options.gfm = gfm;
+      if (breaks !== undefined) options.breaks = breaks;
+      const htmlContent = await marked(markdown, options);
       const reactElements = parse(htmlContent);
       const result = processChildren(
         reactElements,
@@ -48,7 +59,7 @@ const Highlight = ({
     };
 
     processMarkdown();
-  }, [setResult, markdown, anchors, activeCommentId]);
+  }, [setResult, markdown, anchors, activeCommentId, gfm, breaks]);
 
   return <>{result.node}</>;
 };
