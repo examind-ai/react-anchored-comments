@@ -151,6 +151,26 @@ Component for rendering markdown content with comments. Highlights text based on
 
 Wrapper for all comments.
 
+Accepts either plain children or a render prop:
+
+```tsx
+<CommentSection>
+  {({ activeCommentId, isNewCommentOpen }) => (
+    <>
+      {!isNewCommentOpen && comments.length === 0 && (
+        <p>Highlight text, then click the + icon that appears.</p>
+      )}
+      {/* NewComment and CommentViews */}
+    </>
+  )}
+</CommentSection>
+```
+
+| Property           | Type             | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------------ | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `activeCommentId`  | `string \| null` | Id of the currently active comment, or `null` when none is active.                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `isNewCommentOpen` | `boolean`        | `true` while the new-comment card is mounted, `false` once it closes. Useful for hiding empty-state content, since comment cards are absolutely positioned over the section. The card can also close without an `onAddSuccess` or `onCancel` callback — disabling the provider closes it too — so prefer this flag over mirroring those callbacks. Stays `false` while an existing comment is being edited: editing is consumer-side and outside this library's knowledge. |
+
 ### CommentView
 
 Component for positioning each comment. You must provide your own comment rendering components.
