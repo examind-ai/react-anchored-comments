@@ -8,8 +8,10 @@ import {
 
 type RenderPropFn = ({
   activeCommentId,
+  isNewCommentOpen,
 }: {
   activeCommentId: string | null;
+  isNewCommentOpen: boolean;
 }) => ReactNode;
 
 const CommentSection = ({
@@ -21,7 +23,7 @@ const CommentSection = ({
 
   const { state, dispatch } = useAnchoredCommentsContext();
 
-  const { activeCommentId } = state;
+  const { activeCommentId, newComment } = state;
 
   const setOffset = useCallback(() => {
     if (!sectionRef.current) return;
@@ -55,6 +57,7 @@ const CommentSection = ({
       {typeof children === 'function'
         ? (children as RenderPropFn)({
             activeCommentId,
+            isNewCommentOpen: Boolean(newComment),
           })
         : children}
     </div>
